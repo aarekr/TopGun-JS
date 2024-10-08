@@ -1,1 +1,2 @@
-# TopGun-JS
+# TopGun (JavaScript)
+
