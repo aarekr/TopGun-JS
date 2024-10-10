@@ -4,7 +4,7 @@ let context = canvas.getContext('2d');
 function draw_shooter(ctx, x, y, radius, options) {
     options = options || {};
     ctx.save();
-    if(options.guide) {
+    /*if(options.guide) {
         ctx.strokeStyle = 'white';
         ctx.fillStyle = 'rgba(0, 0, 0, 0.25)';
         ctx.lineWidth = 0.5;
@@ -12,7 +12,7 @@ function draw_shooter(ctx, x, y, radius, options) {
         ctx.arc(x, y, radius, 0, 2 * Math.PI);
         ctx.stroke();
         ctx.fill();
-    }
+    }*/
     ctx.lineWidth = options.lineWidth || 2;
     ctx.strokeStyle = options.stroke || 'white';
     ctx.fillStyle = options.fill || 'black';
@@ -62,11 +62,11 @@ function draw_asteroid(ctx, radius, segments, options) {
     ctx.closePath();
     ctx.fill();
     ctx.stroke();
-    if (options.guide) {
+    /*if (options.guide) {
         ctx.lineWidth = 0.5;
         ctx.arc(0, 0, radius, 0, 2 * Math.PI);
         ctx.stroke();
-    }
+    }*/
     ctx.restore();
 }
 
@@ -75,8 +75,8 @@ draw_shooter(context, 270, 300, 30, {guide: true});
 
 // drawing asteroids
 let segments = 25, noise = 0.4;  // segments = corners
-for (let x=0.1; x<1; x+=0.2) {
-    for (let y=0.1; y<1; y+=0.2) {
+for (let x=0.1; x<1; x+=0.5) {
+    for (let y=0.1; y<1; y+=0.5) {
         context.save();
         context.translate(context.canvas.width * x, context.canvas.height * y);
         draw_asteroid(context, context.canvas.width / 12, segments, {noise: noise, guide: true});
