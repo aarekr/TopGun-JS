@@ -160,6 +160,62 @@ function draw_enemy_small_dumb(dy) {
     context.fill();
     context.stroke();
 }
+
+function Shooter() {
+    this.x = 200;
+    this.y = 400;
+    function moveRight() {
+        return this.x += 10;
+    }
+}
+let shooter = new Shooter();
+function draw_shooter(shooter) {
+    context.beginPath();
+    context.strokeStyle = '#FFFFFF';
+    context.fillStyle = '#FFFFFF';
+    context.lineWidth = 2;
+    context.moveTo(shooter.x, shooter.y);
+    context.lineTo(shooter.x + 10, shooter.y + 30);
+    context.lineTo(shooter.x - 10, shooter.y + 30);
+    context.fill();
+    context.stroke();
+}
+function moveRight() {
+    return shooter.x += 10;
+}
+function moveLeft() {
+    return shooter.x -= 10;
+}
+function moveUp() {
+    return shooter.y -= 10;
+}
+function moveDown() {
+    return shooter.y += 10;
+}
+
+window.onkeydown = function(e) {
+    let key = e.key || e.keyCode;
+    console.log('key: ', key);
+    switch(key) {
+        case 'ArrowRight':
+            console.log('right key pressed: ', key);
+            moveRight();
+            break;
+        case 'ArrowLeft':
+            console.log('left key pressed');
+            moveLeft();
+            break;
+        case 'ArrowUp':
+            console.log('up key pressed');
+            moveUp();
+            break;
+        case 'ArrowDown':
+            console.log('down key pressed');
+            moveDown();
+            break;
+    }
+}
+
 function frame(timestamp) {
     context.clearRect(0, 0, context.canvas.width, context.canvas.height);
     if (!previous) previous = timestamp;
@@ -168,6 +224,7 @@ function frame(timestamp) {
     dy_asteroid_dumb += 2;
     dy_small_dumb++;
     draw_gunship();
+    draw_shooter(shooter);
     //create_asteroids();
     draw_asteroid_dumb(dy_asteroid_dumb);
     draw_enemy_small_dumb(dy_small_dumb);
