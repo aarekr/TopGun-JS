@@ -164,11 +164,9 @@ function draw_enemy_small_dumb(dy) {
 function Shooter() {
     this.x = 200;
     this.y = 400;
-    function moveRight() {
-        return this.x += 10;
-    }
 }
 let shooter = new Shooter();
+
 function draw_shooter(shooter) {
     context.beginPath();
     context.strokeStyle = '#FFFFFF';
@@ -180,38 +178,73 @@ function draw_shooter(shooter) {
     context.fill();
     context.stroke();
 }
+
+let bulletList = [];
+function Bullet() {
+    this.x = shooter.x;
+    this.y = shooter.y;
+}
+let bullet = new Bullet();
+bulletList.push(bullet);
+function shoot_bullet() {
+    let bullet = new Bullet();
+    bulletList.push(bullet);
+}
+function draw_bullet(bullet) {
+    context.beginPath();
+    context.strokeStyle = '#FFFFFF';
+    context.fillStyle = '#FFFFFF';
+    context.lineWidth = 2;
+    context.moveTo(bullet.x, bullet.y);
+    bullet.y -= 10;
+    context.lineTo(bullet.x, bullet.y);
+    context.fill();
+    context.stroke();
+}
+function handle_bullet_positions(bulletList) {
+    for (let i=0; i<bulletList.length; i++) {
+        //console.log('handle:', bulletList[i]);
+        draw_bullet(bulletList[i]);
+    }
+}
+handle_bullet_positions(bulletList)
+
 function moveRight() {
+    console.log('shooter position:', shooter.x, shooter.y);
     return shooter.x += 10;
 }
 function moveLeft() {
+    console.log('shooter position:', shooter.x, shooter.y);
     return shooter.x -= 10;
 }
 function moveUp() {
+    console.log('shooter position:', shooter.x, shooter.y);
     return shooter.y -= 10;
 }
 function moveDown() {
+    console.log('shooter position:', shooter.x, shooter.y);
     return shooter.y += 10;
 }
+//function shootBullet() {}
 
 window.onkeydown = function(e) {
     let key = e.key || e.keyCode;
     console.log('key: ', key);
     switch(key) {
         case 'ArrowRight':
-            console.log('right key pressed: ', key);
             moveRight();
             break;
         case 'ArrowLeft':
-            console.log('left key pressed');
             moveLeft();
             break;
         case 'ArrowUp':
-            console.log('up key pressed');
             moveUp();
             break;
         case 'ArrowDown':
-            console.log('down key pressed');
             moveDown();
+            break;
+        case 's':
+            shoot_bullet();
             break;
     }
 }
@@ -225,6 +258,7 @@ function frame(timestamp) {
     dy_small_dumb++;
     draw_gunship();
     draw_shooter(shooter);
+    handle_bullet_positions(bulletList);
     //create_asteroids();
     draw_asteroid_dumb(dy_asteroid_dumb);
     draw_enemy_small_dumb(dy_small_dumb);
