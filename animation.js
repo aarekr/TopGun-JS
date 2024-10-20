@@ -163,7 +163,7 @@ function draw_enemy_small_dumb(dy) {
 
 function Shooter() {
     this.x = 200;
-    this.y = 400;
+    this.y = 520;
 }
 let shooter = new Shooter();
 
@@ -196,40 +196,45 @@ function draw_bullet(bullet) {
     context.fillStyle = '#FFFFFF';
     context.lineWidth = 2;
     context.moveTo(bullet.x, bullet.y);
+    //console.log('bullet position:', bullet.x, bullet.y);
     bullet.y -= 10;
     context.lineTo(bullet.x, bullet.y);
     context.fill();
     context.stroke();
 }
+let bulletListIteratorFirst = 0;
 function handle_bullet_positions(bulletList) {
-    for (let i=0; i<bulletList.length; i++) {
+    for (let i=bulletListIteratorFirst; i<bulletList.length; i++) {
         //console.log('handle:', bulletList[i]);
+        if (bulletList[i].y < -20) {
+            bulletListIteratorFirst++;
+        }
         draw_bullet(bulletList[i]);
     }
 }
 handle_bullet_positions(bulletList)
 
 function moveRight() {
-    console.log('shooter position:', shooter.x, shooter.y);
+    //console.log('shooter position:', shooter.x, shooter.y);
     return shooter.x += 10;
 }
 function moveLeft() {
-    console.log('shooter position:', shooter.x, shooter.y);
+    //console.log('shooter position:', shooter.x, shooter.y);
     return shooter.x -= 10;
 }
 function moveUp() {
-    console.log('shooter position:', shooter.x, shooter.y);
+    //console.log('shooter position:', shooter.x, shooter.y);
     return shooter.y -= 10;
 }
 function moveDown() {
-    console.log('shooter position:', shooter.x, shooter.y);
+    //console.log('shooter position:', shooter.x, shooter.y);
     return shooter.y += 10;
 }
 //function shootBullet() {}
 
 window.onkeydown = function(e) {
     let key = e.key || e.keyCode;
-    console.log('key: ', key);
+    //console.log('key: ', key);
     switch(key) {
         case 'ArrowRight':
             moveRight();
@@ -245,6 +250,9 @@ window.onkeydown = function(e) {
             break;
         case 's':
             shoot_bullet();
+            setTimeout(() => 
+                shoot_bullet(), 70
+            );
             break;
     }
 }
@@ -263,7 +271,7 @@ function frame(timestamp) {
     draw_asteroid_dumb(dy_asteroid_dumb);
     draw_enemy_small_dumb(dy_small_dumb);
     //draw_asteroid_object(asteroidi);
-    asteroid_list.forEach(a => draw_asteroid_object(a))
+    //asteroid_list.forEach(a => draw_asteroid_object(a))
     previous = timestamp;
     window.requestAnimationFrame(frame);
 }
