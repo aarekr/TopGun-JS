@@ -154,11 +154,27 @@ function draw_enemy_small_dumb(dy) {
     context.strokeStyle = '#FFFFFF';
     context.fillStyle = '#FFFFFF';
     context.lineWidth = 2;
-    context.moveTo(300, 0 + dy);
-    context.lineTo(310, -20 + dy);
-    context.lineTo(290, -20 + dy);
+    context.moveTo(100, 0 + dy);
+    context.lineTo(110, -20 + dy);
+    context.lineTo(90, -20 + dy);
     context.fill();
     context.stroke();
+}
+
+let enemyList = [[350,0], [400,0], [450,0]];
+function draw_three_small_dumb_enemies(dy) {
+    for (let i=0; i<enemyList.length; i++) {
+        console.log('---> ', enemyList[i][0], enemyList[i][1])
+        context.beginPath();
+        context.strokeStyle = '#FFFFFF';
+        context.fillStyle = '#FFFFFF';
+        context.lineWidth = 2;
+        context.moveTo(enemyList[i][0] + 0, 0 + dy);
+        context.lineTo(enemyList[i][0] + 10, -20 + dy);
+        context.lineTo(enemyList[i][0] - 10, -20 + dy);
+        context.fill();
+        context.stroke();
+    }
 }
 
 function Shooter() {
@@ -196,7 +212,6 @@ function draw_bullet(bullet) {
     context.fillStyle = '#FFFFFF';
     context.lineWidth = 2;
     context.moveTo(bullet.x, bullet.y);
-    //console.log('bullet position:', bullet.x, bullet.y);
     bullet.y -= 10;
     context.lineTo(bullet.x, bullet.y);
     context.fill();
@@ -205,7 +220,6 @@ function draw_bullet(bullet) {
 let bulletListIteratorFirst = 0;
 function handle_bullet_positions(bulletList) {
     for (let i=bulletListIteratorFirst; i<bulletList.length; i++) {
-        //console.log('handle:', bulletList[i]);
         if (bulletList[i].y < -20) {
             bulletListIteratorFirst++;
         }
@@ -250,10 +264,35 @@ window.onkeydown = function(e) {
             break;
         case 's':
             shoot_bullet();
-            setTimeout(() => 
-                shoot_bullet(), 70
-            );
+            //setTimeout(() => shoot_bullet(), 70);
             break;
+    }
+}
+
+let showTestTarget = true;
+let testTargetPosition = {'x': 290, 'y': 200}
+function draw_test_target() {
+    context.beginPath();
+    context.strokeStyle = '#FFFFFF';
+    context.fillStyle = '#FFFFFF';
+    context.lineWidth = 2;
+    context.moveTo(testTargetPosition.x, testTargetPosition.y);
+    context.lineTo(testTargetPosition.x + 20, testTargetPosition.y);
+    context.lineTo(testTargetPosition.x + 20, testTargetPosition.y + 20);
+    context.lineTo(testTargetPosition.x, testTargetPosition.y + 20);
+    context.fill();
+    context.stroke();
+}
+
+function check_collisions_bullets_items() {
+    for (let i=bulletListIteratorFirst; i<bulletList.length; i++) {
+        //console.log('bullet positions:', bulletList[i].x, bulletList[i].y);
+        if (bulletList[i].x > testTargetPosition.x && bulletList[i].x < testTargetPosition.x + 20) {
+            if (bulletList[i].y > testTargetPosition.y && bulletList[i].y < testTargetPosition.y + 20) {
+                console.log('a bullet hit the test target', bulletList[i].y);
+                showTestTarget = false;
+            }
+        }
     }
 }
 
@@ -264,12 +303,14 @@ function frame(timestamp) {
     //dx--;
     dy_asteroid_dumb += 2;
     dy_small_dumb++;
-    draw_gunship();
+    //draw_gunship();  // original
     draw_shooter(shooter);
-    handle_bullet_positions(bulletList);
-    //create_asteroids();
+    if (showTestTarget == true) draw_test_target();
     draw_asteroid_dumb(dy_asteroid_dumb);
     draw_enemy_small_dumb(dy_small_dumb);
+    draw_three_small_dumb_enemies(dy_small_dumb);
+    handle_bullet_positions(bulletList);
+    check_collisions_bullets_items();
     //draw_asteroid_object(asteroidi);
     //asteroid_list.forEach(a => draw_asteroid_object(a))
     previous = timestamp;
