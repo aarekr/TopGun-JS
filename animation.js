@@ -149,6 +149,7 @@ let bulletList = [];
 function Bullet() {
     this.x = shooter.x;
     this.y = shooter.y;
+    this.hit = false;
 }
 //let bullet = new Bullet();
 //bulletList.push(bullet);
@@ -183,7 +184,7 @@ function moveLeft() { return shooter.x -= 10; }
 function moveUp() { return shooter.y -= 10; }
 function moveDown() { return shooter.y += 10; }
 
-window.onkeydown = function(e) {
+/*window.onkeydown = function(e) {
     let key = e.key || e.keyCode;
     //console.log('key: ', key);
     switch(key) {
@@ -204,48 +205,125 @@ window.onkeydown = function(e) {
             //setTimeout(() => shoot_bullet(), 70);
             break;
     }
-}
+}*/
 
 let showTestTarget = true;
-let testTargetPosition = {'x': 290, 'y': 200}
+let testTarget = {'x': 290, 'y': 200, 'width': 20, 'height': 20}
 function draw_test_target() {
     context.beginPath();
     context.strokeStyle = '#FFFFFF';
     context.fillStyle = '#FFFFFF';
     context.lineWidth = 2;
-    context.moveTo(testTargetPosition.x, testTargetPosition.y);
-    context.lineTo(testTargetPosition.x + 20, testTargetPosition.y);
-    context.lineTo(testTargetPosition.x + 20, testTargetPosition.y + 20);
-    context.lineTo(testTargetPosition.x, testTargetPosition.y + 20);
+    context.moveTo(testTarget.x, testTarget.y);
+    context.lineTo(testTarget.x + testTarget.width, testTarget.y);
+    context.lineTo(testTarget.x + testTarget.width, testTarget.y + testTarget.height);
+    context.lineTo(testTarget.x, testTarget.y + testTarget.height);
     context.fill();
     context.stroke();
+}
+
+let activeTargetList = [];
+function ActiveTarget(x, y, hitPoints) {
+    this.x = x;
+    this.y = y;
+    this.hitPoints = hitPoints;
+    this.show = true;
+}
+function create_active_target() {
+    let x = 50 + 500 * Math.random();
+    let y = -30;
+    let hitPoints = 1 + Math.floor(3 * Math.random());
+    let new_target = new ActiveTarget(x, y, hitPoints);
+    activeTargetList.push(new_target);
+    //console.log('activeTargetList:', activeTargetList);
+}
+/*for (let i=0; i<5; i++) {
+    setTimeout(() => create_active_target(), i*20);
+}*/
+function draw_active_targets() {
+    for (let i=0; i<activeTargetList.length; i++) {
+        //console.log('draw_active_targets:', activeTargetList[i].hitPoints);
+        if (activeTargetList[i].hitPoints < 1) continue;
+        context.beginPath();
+        context.strokeStyle = '#FFFFFF';
+        context.fillStyle = '#FFFFFF';
+        context.lineWidth = 2;
+        activeTargetList[i].y += 1;
+        context.moveTo(activeTargetList[i].x, activeTargetList[i].y);
+        context.lineTo(activeTargetList[i].x + 20, activeTargetList[i].y);
+        context.lineTo(activeTargetList[i].x + 20, activeTargetList[i].y + 20);
+        context.lineTo(activeTargetList[i].x, activeTargetList[i].y + 20);
+        context.fill();
+        context.stroke();
+    }
 }
 
 function check_collisions_bullets_items() {
     for (let i=bulletListIteratorFirst; i<bulletList.length; i++) {
         //console.log('bullet positions:', bulletList[i].x, bulletList[i].y);
-        if (showTestTarget == true) {
-            if (bulletList[i].x >= testTargetPosition.x && bulletList[i].x <= testTargetPosition.x + 20) {
-                if (bulletList[i].y >= testTargetPosition.y && bulletList[i].y <= testTargetPosition.y + 20) {
+        /*if (showTestTarget == true) {
+            if (bulletList[i].x >= testTarget.x && bulletList[i].x <= testTarget.x + 20) {
+                if (bulletList[i].y >= testTarget.y && bulletList[i].y <= testTarget.y + 20) {
                     console.log('a bullet hit the test target', bulletList[i].y);
                     showTestTarget = false;
                     bulletListIteratorFirst++;
                 }
             }
-        }
-        if (static_asteroid.show) {
-            console.log('static x,y:', static_asteroid.x, static_asteroid.y);
+        }*/
+        if (bulletList[i].hit == true) continue;
+        if (activeTargetList[i] == undefined) continue;
+        for (let i=0; i<activeTargetList.length; i++) {
+            //console.log('activeTargetList hitPoints alussa:', activeTargetList[i].hitPoints)
+            if (bulletList[i].x >= activeTargetList[i].x && bulletList[i].x <= activeTargetList[i].x + 20) {
+                if (bulletList[i].y >= activeTargetList[i].y && bulletList[i].y <= activeTargetList[i].y + 20) {
+                    console.log('x y : hits target')
+                    activeTargetList[i].hitPoints--;
+                    bulletList[i].hit = true;
+                    //bulletListIteratorFirst++;
+                    //break;
+                }
+                //console.log('activeTargetList hitPoints:', activeTargetList[i].hitPoints)
+            }
+            //console.log('activeTargetList hitPoints lopussa:', activeTargetList[i].hitPoints)
         }
     }
 }
 
 function guide_shooter() {
-    console.log('shooter-test_target:', shooter.x - testTargetPosition.x);
-    let difference = shooter.x - testTargetPosition.x;
+    //console.log('shooter-test_target:', shooter.x - (testTarget.x+testTarget.width/2));
+    let difference = shooter.x - (testTarget.x+testTarget.width/2);
     if (difference <= 0) shooter.x++;
-    if (difference == 0) shoot_bullet();
+    if (difference == 0) {
+        let time = 0;
+        for (let i=0; i<3; i++) {
+            setTimeout(() => shoot_bullet(), time);
+            time += 50;
+        }
+    }
 }
 
+let active_target_pointer = 0;
+function go_through_active_target_list() {
+    /*for (let i=0; i<activeTargetList.length; i++) {
+        console.log('active target:', activeTargetList[i]);
+    }*/
+    if (activeTargetList[active_target_pointer] != undefined) {
+        //console.log('active target:', activeTargetList[active_target_pointer]);
+        let difference = shooter.x - (activeTargetList[active_target_pointer].x+20/2);
+        if (difference < 0) shooter.x += 2;
+        else if (difference > 0) shooter.x -= 2;
+        if (Math.abs(difference) < 1) {
+            let time = 0;
+            for (let i=0; i<activeTargetList[active_target_pointer].hitPoints; i++) {
+                setTimeout(() => shoot_bullet(), time);
+                time += 30;
+            }
+            active_target_pointer++;
+        }
+    }
+}
+
+let dy_active_targets = 0;
 let counter = 0;
 function frame(timestamp) {
     context.clearRect(0, 0, context.canvas.width, context.canvas.height);
@@ -255,19 +333,23 @@ function frame(timestamp) {
     dy_asteroid_dumb += 2;
     dy_asteroid_static += 0.0;
     dy_small_dumb++;
+    dy_active_targets++;
     counter++;
-    if (counter%60 == 0) {
-        console.log('counter:', counter);
+    if (counter%120 == 0) {
+        //console.log('counter:', counter);
         //counter = 0;
+        create_active_target();
     }
-    guide_shooter();
+    //guide_shooter();
     //draw_gunship();  // original
     draw_shooter(shooter);
-    if (showTestTarget == true) draw_test_target();
+    go_through_active_target_list();
+    //if (showTestTarget == true) draw_test_target();
     draw_asteroid_static(dy_asteroid_static);
     draw_asteroid_dumb(dy_asteroid_dumb);
     draw_enemy_small_dumb(dy_small_dumb);
     draw_three_small_dumb_enemies(dy_small_dumb);
+    draw_active_targets();
     handle_bullet_positions(bulletList);
     check_collisions_bullets_items();
     //draw_asteroid_object(asteroidi);
