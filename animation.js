@@ -272,7 +272,7 @@ function draw_active_targets() {
 }
 
 function check_collisions_bullets_items() {
-    //console.log("test target:", testTarget);  // x:290, y:200
+    /* //test target
     for (let j=0; j<bulletList.length; j++) {
         if (bulletList[j].x < testTarget.x+testTarget.width && testTarget.x < bulletList[j].x) {
             if (bulletList[j].y < testTarget.y+testTarget.height && testTarget.y < bulletList[j].y) {
@@ -280,53 +280,20 @@ function check_collisions_bullets_items() {
                 bulletList[j].hit = true;
             }
         }
-    }
-    /*for (let i=0; i<activeTargetList.length; i++) {
-        //console.log("check collision:", i, activeTargetList[i].hitPoints, activeTargetList[i].show);
-        for (let j=0; j<bulletList.length; j++) {
-            if (activeTargetList[i].x-5 < bulletList[j].x && bulletList[j].x < activeTargetList[i].x+5) {
-                console.log("bullet:");
-            }
-        }
     }*/
-    //for (let i=bulletListIteratorFirst; i<bulletList.length; i++) {
-        //console.log('bullet positions:', bulletList[i].x, bulletList[i].y);
-        /*if (showTestTarget == true) {
-            if (bulletList[i].x >= testTarget.x && bulletList[i].x <= testTarget.x + 20) {
-                if (bulletList[i].y >= testTarget.y && bulletList[i].y <= testTarget.y + 20) {
-                    console.log('a bullet hit the test target', bulletList[i].y);
-                    showTestTarget = false;
-                    bulletListIteratorFirst++;
-                }
-            }
-        }*/
-    /*    if (bulletList[i].hit == true) continue;
-        if (activeTargetList[i] == undefined) continue;
-        console.log('->',i,bulletList.length,bulletListIteratorFirst, 'bulletList:', bulletList);
-        for (let j=0; j<activeTargetList.length; j++) {
-            //console.log('activeTargetList hitPoints alussa:', activeTargetList[i].hitPoints)
-            console.log('--->', activeTargetList.length)
-            if (bulletList[i].x >= activeTargetList[i].x && bulletList[i].x <= activeTargetList[i].x + 20) {
-                if (bulletList[i].y >= activeTargetList[i].y && bulletList[i].y <= activeTargetList[i].y + 20) {
-                    console.log('activeTargetList[i].hitPoints alku :', activeTargetList[i].hitPoints);
+    for (let j=0; j<bulletList.length; j++) {
+        if (bulletList[j].hit == true) continue;
+        for (let i=0; i<activeTargetList.length; i++) {
+            if (activeTargetList[i].hitPoints <=0) continue;
+            if (bulletList[j].x < activeTargetList[i].x+40 && activeTargetList[i].x < bulletList[j].x) {
+                if (bulletList[j].y < activeTargetList[i].y+40 && activeTargetList[i].y < bulletList[j].y) {
+                    console.log("moving target hit");
                     activeTargetList[i].hitPoints--;
-                    bulletList[i].hit = true;
-                    console.log('activeTargetList[i].hitPoints loppu:', activeTargetList[i].hitPoints);
-                    console.log('bulletList:', bulletList);
-                    //bulletListIteratorFirst++;
-                    //break;
+                    bulletList[j].hit = true;
                 }
-                //console.log('activeTargetList hitPoints:', activeTargetList[i].hitPoints)
             }
-            //console.log('activeTargetList hitPoints lopussa:', activeTargetList[i].hitPoints)
         }
-    }*/
-    /*for (let i=0; i<activeTargetList.length; i++) {
-        console.log('activeTargetList.length:', activeTargetList.length);
-        for (let j=bulletListIteratorFirst; j<bulletList.length; j++) {
-            console.log('--->', bulletList[j])
-        }
-    }*/
+    }
 }
 
 function guide_shooter() {
@@ -374,13 +341,13 @@ function frame(timestamp) {
     dy_active_targets++;
     counter++;
     if (counter%180 == 0) {  // creating an active target every 3 seconds
-        //create_active_target();
+        create_active_target();
     }
     guide_shooter();  // this moves shooter
     //draw_gunship();   // original
     draw_shooter(shooter);  // moving shooter
     go_through_active_target_list();
-    if (showTestTarget == true && testTarget.hitpoints > 0) draw_test_target();
+    //if (showTestTarget == true && testTarget.hitpoints > 0) draw_test_target();
     draw_asteroid_static(dy_asteroid_static);
     draw_asteroid_dumb(dy_asteroid_dumb);
     draw_enemy_small_dumb(dy_small_dumb);
