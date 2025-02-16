@@ -153,12 +153,12 @@ function Bullet() {
     this.y = shooter.y;
     this.hit = false;
 }
-//let bullet = new Bullet();
-//bulletList.push(bullet);
+
 function shoot_bullet() {
     let bullet = new Bullet();
     bulletList.push(bullet);
 }
+
 function draw_bullet(bullet) {
     if (bullet.hit == false) {
         context.beginPath();
@@ -181,35 +181,47 @@ function handle_bullet_positions(bulletList) {
         draw_bullet(bulletList[i]);
     }
 }
-//handle_bullet_positions(bulletList)
+
+let side_missile_list = [];
+function SideMissile() {
+    this.x = shooter.x;
+    this.y = shooter.y+15;
+    this.hit = false;
+}
+
+function shoot_side_missile() {
+    let side_missile = new SideMissile();
+    side_missile_list.push(side_missile);
+}
+
+function draw_side_missile(side_missile) {
+    if (side_missile.hit == false) {
+        context.beginPath();
+        context.strokeStyle = '#FFFFFF';
+        context.fillStyle = '#FFFFFF';
+        context.lineWidth = 2;
+        context.moveTo(side_missile.x, side_missile.y);
+        side_missile.y -= 5;
+        side_missile.x -= 5;
+        context.lineTo(side_missile.x, side_missile.y);
+        context.fill();
+        context.stroke();
+    }
+}
+
+let sideMissileListIteratorFirst = 0;
+function handle_side_missile_positions(side_missile_list) {
+    for (let i = 0; i < side_missile_list.length; i++) {
+        draw_side_missile(side_missile_list[i]);
+    }
+}
 
 function moveRight() { return shooter.x += 10; }
 function moveLeft() { return shooter.x -= 10; }
 function moveUp() { return shooter.y -= 10; }
 function moveDown() { return shooter.y += 10; }
 
-/*window.onkeydown = function(e) {
-    let key = e.key || e.keyCode;
-    //console.log('key: ', key);
-    switch(key) {
-        case 'ArrowRight':
-            moveRight();
-            break;
-        case 'ArrowLeft':
-            moveLeft();
-            break;
-        case 'ArrowUp':
-            moveUp();
-            break;
-        case 'ArrowDown':
-            moveDown();
-            break;
-        case 's':
-            shoot_bullet();
-            //setTimeout(() => shoot_bullet(), 70);
-            break;
-    }
-}*/
+// create active target manually by pressing 'n'
 window.onkeydown = function(e) {
     let key = e.key || e.keyCode
     console.log('key: ', key);
@@ -306,6 +318,7 @@ function guide_shooter() {
             setTimeout(() => shoot_bullet(), time);
             time += 50;
         }
+        shoot_side_missile();
     }
 }
 
@@ -354,6 +367,7 @@ function frame(timestamp) {
     draw_three_small_dumb_enemies(dy_small_dumb);
     draw_active_targets();
     handle_bullet_positions(bulletList);
+    handle_side_missile_positions(side_missile_list);
     check_collisions_bullets_items();
     //draw_asteroid_object(asteroidi);
     //asteroid_list.forEach(a => draw_asteroid_object(a))
