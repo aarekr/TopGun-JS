@@ -183,26 +183,35 @@ function handle_bullet_positions(bulletList) {
 }
 
 let side_missile_list = [];
-function SideMissile() {
+function SideMissile(direction, target_pointer) {
     this.x = shooter.x;
     this.y = shooter.y+15;
+    this.direction = direction;
+    this.target_pointer = target_pointer;
     this.hit = false;
 }
 
-function shoot_side_missile() {
-    let side_missile = new SideMissile();
+function shoot_side_missile(direction, target_pointer) {
+    let side_missile = new SideMissile(direction, target_pointer);
     side_missile_list.push(side_missile);
 }
 
 function draw_side_missile(side_missile) {
-    if (side_missile.hit == false) {
+    if (side_missile.hit == false && side_missile.x > -40 && side_missile.y > -40) {
         context.beginPath();
         context.strokeStyle = '#FFFFFF';
         context.fillStyle = '#FFFFFF';
         context.lineWidth = 2;
         context.moveTo(side_missile.x, side_missile.y);
-        side_missile.y -= 5;
-        side_missile.x -= 5;
+        //console.log("side_missile:", side_missile.x, side_missile.y);
+        //console.log("side_missile target:", activeTargetList[side_missile.target_pointer]);
+        side_missile.y -= 7;
+        if (side_missile.x > activeTargetList[side_missile.target_pointer].x + 20) {
+            let difference = side_missile.x - (activeTargetList[side_missile.target_pointer].x + 20);
+            let delta_x = 7 * difference/100;  // missile x change is relative to target x
+            if (delta_x > 7) delta_x = 7;      // missile x change is max 7
+            side_missile.x -= delta_x;
+        }
         context.lineTo(side_missile.x, side_missile.y);
         context.fill();
         context.stroke();
@@ -262,9 +271,7 @@ function create_active_target() {
     activeTargetList.push(new_target);
     //console.log('activeTargetList:', activeTargetList);
 }
-/*for (let i=0; i<5; i++) {
-    setTimeout(() => create_active_target(), i*20);
-}*/
+
 function draw_active_targets() {
     for (let i=0; i<activeTargetList.length; i++) {
         //console.log('draw_active_targets:', activeTargetList[i].hitPoints);
@@ -308,28 +315,24 @@ function check_collisions_bullets_items() {
     }
 }
 
-function guide_shooter() {
-    //console.log('shooter-test_target:', shooter.x - (testTarget.x+testTarget.width/2));
-    let difference = shooter.x - (testTarget.x+testTarget.width/2);
-    if (difference <= 0) shooter.x++;
-    if (difference == 0) {
-        let time = 0;
-        for (let i=0; i<3; i++) {
-            setTimeout(() => shoot_bullet(), time);
-            time += 50;
-        }
-        shoot_side_missile();
-    }
-}
-
 let active_target_pointer = 0;
 function go_through_active_target_list() {
-    /*for (let i=0; i<activeTargetList.length; i++) {
-        console.log('active target:', activeTargetList[i]);
-    }*/
     if (activeTargetList[active_target_pointer] != undefined) {
         //console.log('active target:', activeTargetList[active_target_pointer]);
         let difference = shooter.x - (activeTargetList[active_target_pointer].x+40/2);
+        // if (difference > 300) shoot_left_missile();
+        if (difference > 100) {
+            //console.log("diff > 100:", difference);
+            let time = 0;
+            for (let i=0; i<activeTargetList[active_target_pointer].hitPoints; i++) {
+                //console.log("activeTargetList[active_target_pointer]:", activeTargetList[active_target_pointer]);
+                let target_pointer = active_target_pointer;
+                setTimeout(() => shoot_side_missile("left", target_pointer), time);
+                time += 30;
+            }
+            active_target_pointer++;
+        }
+        // if (difference < 300) shoot_right_missile();
         if (difference < 0) shooter.x += 2;
         else if (difference > 0) shooter.x -= 2;
         if (Math.abs(difference) < 1) {
@@ -356,7 +359,6 @@ function frame(timestamp) {
     if (counter%180 == 0) {  // creating an active target every 3 seconds
         create_active_target();
     }
-    guide_shooter();  // this moves shooter
     //draw_gunship();   // original
     draw_shooter(shooter);  // moving shooter
     go_through_active_target_list();
