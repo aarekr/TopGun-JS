@@ -205,12 +205,18 @@ function draw_side_missile(side_missile) {
         context.moveTo(side_missile.x, side_missile.y);
         //console.log("side_missile:", side_missile.x, side_missile.y);
         //console.log("side_missile target:", activeTargetList[side_missile.target_pointer]);
-        side_missile.y -= 7;
+        side_missile.y -= 5;
         if (side_missile.x > activeTargetList[side_missile.target_pointer].x + 20) {
             let difference = side_missile.x - (activeTargetList[side_missile.target_pointer].x + 20);
             let delta_x = 7 * difference/100;  // missile x change is relative to target x
             if (delta_x > 7) delta_x = 7;      // missile x change is max 7
             side_missile.x -= delta_x;
+        }
+        if (side_missile.x < activeTargetList[side_missile.target_pointer].x + 20) {
+            let difference = (activeTargetList[side_missile.target_pointer].x + 20) - side_missile.x;
+            let delta_x = 7 * difference/100;  // missile x change is relative to target x
+            if (delta_x > 7) delta_x = 7;      // missile x change is max 7
+            side_missile.x += delta_x;
         }
         context.lineTo(side_missile.x, side_missile.y);
         context.fill();
@@ -242,7 +248,7 @@ window.onkeydown = function(e) {
 }
 
 let showTestTarget = true;
-let testTarget = {'x': 290, 'y': 200, 'width': 20, 'height': 20, 'hitpoints': 3}
+let testTarget = {'x': 290, 'y': 200, 'width': 20, 'height': 20, 'hitPoints': 3}
 function draw_test_target() {
     context.beginPath();
     context.strokeStyle = '#FFFFFF';
@@ -320,9 +326,10 @@ function go_through_active_target_list() {
     if (activeTargetList[active_target_pointer] != undefined) {
         //console.log('active target:', activeTargetList[active_target_pointer]);
         let difference = shooter.x - (activeTargetList[active_target_pointer].x+40/2);
-        // if (difference > 300) shoot_left_missile();
-        if (difference > 100) {
-            //console.log("diff > 100:", difference);
+        //console.log("difference:", difference);
+        if (difference > 0 && difference <=200) shooter.x -= 2;
+        else if (difference < 0 && difference >= -200) shooter.x += 2;
+        else if (difference > 200) {  // shooting left side missile
             let time = 0;
             for (let i=0; i<activeTargetList[active_target_pointer].hitPoints; i++) {
                 //console.log("activeTargetList[active_target_pointer]:", activeTargetList[active_target_pointer]);
@@ -332,10 +339,17 @@ function go_through_active_target_list() {
             }
             active_target_pointer++;
         }
-        // if (difference < 300) shoot_right_missile();
-        if (difference < 0) shooter.x += 2;
-        else if (difference > 0) shooter.x -= 2;
-        if (Math.abs(difference) < 1) {
+        else if (difference < -200) {  // shooting right side missile
+            let time = 0;
+            for (let i=0; i<activeTargetList[active_target_pointer].hitPoints; i++) {
+                //console.log("activeTargetList[active_target_pointer]:", activeTargetList[active_target_pointer]);
+                let target_pointer = active_target_pointer;
+                setTimeout(() => shoot_side_missile("right", target_pointer), time);
+                time += 30;
+            }
+            active_target_pointer++;
+        }
+        if (Math.abs(difference) < 1) {  // shooter pointing at target
             let time = 0;
             for (let i=0; i<activeTargetList[active_target_pointer].hitPoints; i++) {
                 setTimeout(() => shoot_bullet(), time);
@@ -362,7 +376,7 @@ function frame(timestamp) {
     //draw_gunship();   // original
     draw_shooter(shooter);  // moving shooter
     go_through_active_target_list();
-    //if (showTestTarget == true && testTarget.hitpoints > 0) draw_test_target();
+    //if (showTestTarget == true && testTarget.hitPoints > 0) draw_test_target();
     draw_asteroid_static(dy_asteroid_static);
     draw_asteroid_dumb(dy_asteroid_dumb);
     draw_enemy_small_dumb(dy_small_dumb);
