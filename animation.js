@@ -306,15 +306,28 @@ function check_collisions_bullets_items() {
             }
         }
     }*/
+    // bullets - targets
     for (let j=0; j<bulletList.length; j++) {
         if (bulletList[j].hit == true) continue;
         for (let i=0; i<activeTargetList.length; i++) {
             if (activeTargetList[i].hitPoints <=0) continue;
             if (bulletList[j].x < activeTargetList[i].x+40 && activeTargetList[i].x < bulletList[j].x) {
                 if (bulletList[j].y < activeTargetList[i].y+40 && activeTargetList[i].y < bulletList[j].y) {
-                    console.log("moving target hit");
                     activeTargetList[i].hitPoints--;
                     bulletList[j].hit = true;
+                }
+            }
+        }
+    }
+    // side missiles - targets
+    for (let j=0; j<side_missile_list.length; j++) {
+        if (side_missile_list[j].hit == true) continue;
+        for (let i=0; i<activeTargetList.length; i++) {
+            if (activeTargetList[i].hitPoints <=0) continue;
+            if (side_missile_list[j].x < activeTargetList[i].x+40 && activeTargetList[i].x < side_missile_list[j].x) {
+                if (side_missile_list[j].y < activeTargetList[i].y+40 && activeTargetList[i].y < side_missile_list[j].y) {
+                    activeTargetList[i].hitPoints--;
+                    side_missile_list[j].hit = true;
                 }
             }
         }
@@ -370,17 +383,17 @@ function frame(timestamp) {
     dy_small_dumb++;
     dy_active_targets++;
     counter++;
-    if (counter%180 == 0) {  // creating an active target every 3 seconds
+    if (counter%60 == 0) {  // creating an active target every 3 seconds
         create_active_target();
     }
     //draw_gunship();   // original
     draw_shooter(shooter);  // moving shooter
     go_through_active_target_list();
     //if (showTestTarget == true && testTarget.hitPoints > 0) draw_test_target();
-    draw_asteroid_static(dy_asteroid_static);
-    draw_asteroid_dumb(dy_asteroid_dumb);
-    draw_enemy_small_dumb(dy_small_dumb);
-    draw_three_small_dumb_enemies(dy_small_dumb);
+    //draw_asteroid_static(dy_asteroid_static);
+    //draw_asteroid_dumb(dy_asteroid_dumb);
+    //draw_enemy_small_dumb(dy_small_dumb);
+    //draw_three_small_dumb_enemies(dy_small_dumb);
     draw_active_targets();
     handle_bullet_positions(bulletList);
     handle_side_missile_positions(side_missile_list);
