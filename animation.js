@@ -20,19 +20,6 @@ function draw_asteroid(ctx, radius, segments) {
     ctx.restore();
 }
 
-function draw_gunship() {
-    context.beginPath();
-    context.strokeStyle = '#FFFFFF';
-    context.fillStyle = '#FFFFFF';
-    context.lineWidth = 2;
-    context.moveTo(500, 500);
-    context.lineTo(520, 540);
-    context.lineTo(500, 525);
-    context.lineTo(480, 540);
-    context.fill();
-    context.stroke();
-}
-
 let dx = 0;
 let dy_asteroid_dumb = 0;
 let dy_asteroid_static = 0;
@@ -113,10 +100,9 @@ function draw_enemy_small_dumb(dy) {
     context.stroke();
 }
 
-let enemyList = [[350,0], [400,0], [450,0]];
+/*let enemyList = [[350,0], [400,0], [450,0]];
 function draw_three_small_dumb_enemies(dy) {
     for (let i=0; i<enemyList.length; i++) {
-        //console.log('---> ', enemyList[i][0], enemyList[i][1])
         context.beginPath();
         context.strokeStyle = '#FFFFFF';
         context.fillStyle = '#FFFFFF';
@@ -127,7 +113,7 @@ function draw_three_small_dumb_enemies(dy) {
         context.fill();
         context.stroke();
     }
-}
+}*/
 
 function Shooter() {
     this.x = 200;
@@ -141,10 +127,38 @@ function draw_shooter(shooter) {
     context.fillStyle = '#FFFFFF';
     context.lineWidth = 2;
     context.moveTo(shooter.x, shooter.y);
-    context.lineTo(shooter.x + 10, shooter.y + 30);
-    context.lineTo(shooter.x - 10, shooter.y + 30);
+    context.lineTo(shooter.x+20, shooter.y+40);
+    context.lineTo(shooter.x, shooter.y+25);
+    context.lineTo(shooter.x-20, shooter.y+40);
     context.fill();
     context.stroke();
+}
+
+let smallDumbEnemyList = [];
+function SmallDumbEnemy() {
+    this.x = 50+ 500 * Math.random();
+    this.y = -30;
+    this.hitPoints = 1;
+}
+
+function create_small_dumb_enemy() {
+    let smallDumbEnemy = new SmallDumbEnemy();
+    smallDumbEnemyList.push(smallDumbEnemy);
+}
+
+function draw_small_dumb_enemy(enemy) {
+    if (enemy.hitPoints > 0) {
+        context.beginPath();
+        context.strokeStyle = '#FFFFFF';
+        context.fillStyle = '#FFFFFF';
+        context.lineWidth = 2;
+        context.moveTo(enemy.x, enemy.y);
+        context.lineTo(enemy.x+10, enemy.y-20);
+        context.lineTo(enemy.x-10, enemy.y-20);
+        context.fill();
+        context.stroke();
+        enemy.y++;
+    }
 }
 
 let bulletList = [];
@@ -373,6 +387,18 @@ function go_through_active_target_list() {
     }
 }
 
+function draw_new_design() {
+    context.beginPath();
+    context.strokeStyle = '#FFFFFF';
+    context.fillStyle = '#FFFFFF';
+    context.lineWidth = 2;
+    context.moveTo(100, 50);
+    context.lineTo(115, 20);
+    context.lineTo(85, 20);
+    context.fill();
+    context.stroke();
+}
+
 function frame(timestamp) {
     context.clearRect(0, 0, context.canvas.width, context.canvas.height);
     if (!previous) previous = timestamp;
@@ -386,14 +412,23 @@ function frame(timestamp) {
     if (counter%60 == 0) {  // creating an active target every 3 seconds
         create_active_target();
     }
-    //draw_gunship();   // original
+    if (counter%180 == 0) {
+        create_small_dumb_enemy();
+        console.log("smallBumbEnemyList:", smallDumbEnemyList.length);
+    }
     draw_shooter(shooter);  // moving shooter
+    if (smallDumbEnemyList.length > 0) {
+        for (let i=0; i<smallDumbEnemyList.length; i++) {
+            draw_small_dumb_enemy(smallDumbEnemyList[i]);
+        }
+    }
     go_through_active_target_list();
     //if (showTestTarget == true && testTarget.hitPoints > 0) draw_test_target();
     //draw_asteroid_static(dy_asteroid_static);
     //draw_asteroid_dumb(dy_asteroid_dumb);
     //draw_enemy_small_dumb(dy_small_dumb);
-    //draw_three_small_dumb_enemies(dy_small_dumb);
+    //draw_three_small_dumb_enemies(dy_small_dumb);  // uncommented, remove
+    draw_new_design();
     draw_active_targets();
     handle_bullet_positions(bulletList);
     handle_side_missile_positions(side_missile_list);
