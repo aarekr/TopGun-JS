@@ -88,7 +88,7 @@ let asteroid_list = [
     new Asteroid(40, 40, 0.2)
 ]
 
-function draw_enemy_small_dumb(dy) {
+/*function draw_enemy_small_dumb(dy) {
     context.beginPath();
     context.strokeStyle = '#FFFFFF';
     context.fillStyle = '#FFFFFF';
@@ -98,7 +98,7 @@ function draw_enemy_small_dumb(dy) {
     context.lineTo(90, -20 + dy);
     context.fill();
     context.stroke();
-}
+}*/
 
 /*let enemyList = [[350,0], [400,0], [450,0]];
 function draw_three_small_dumb_enemies(dy) {
@@ -136,7 +136,7 @@ function draw_shooter(shooter) {
 
 let smallDumbEnemyList = [];
 function SmallDumbEnemy() {
-    this.x = 50+ 500 * Math.random();
+    this.x = 50 + 500 * Math.random();
     this.y = -30;
     this.hitPoints = 1;
 }
@@ -158,6 +158,37 @@ function draw_small_dumb_enemy(enemy) {
         context.fill();
         context.stroke();
         enemy.y++;
+    }
+}
+
+let mediumSimpleEnemyList = [];
+function MediumSimpleEnemy() {
+    this.x = -50;
+    this.y = 70;
+    this.hitPoints = 10;
+    this.moveDirection = "right";
+}
+
+function create_medium_simple_enemy() {
+    let mediumSimpleEnemy = new MediumSimpleEnemy();
+    mediumSimpleEnemyList.push(mediumSimpleEnemy);
+}
+
+function draw_medium_simple_enemy(enemy) {
+    if (enemy.hitPoints > 0) {
+        context.beginPath();
+        context.strokeStyle = '#FFFFFF';
+        context.fillStyle = '#FFFFFF';
+        context.lineWidth = 2;
+        if (enemy.moveDirection == "right") enemy.x++;
+        else if (enemy.moveDirection == "left") enemy.x--;
+        if (enemy.x >= 550) enemy.moveDirection = "left";
+        else if (enemy.x <= 200) enemy,moveDirection = "right";
+        context.moveTo(enemy.x, enemy.y);
+        context.lineTo(enemy.x+20, enemy.y-40);
+        context.lineTo(enemy.x-20, enemy.y-40);
+        context.fill();
+        context.stroke();
     }
 }
 
@@ -250,7 +281,7 @@ function moveLeft() { return shooter.x -= 10; }
 function moveUp() { return shooter.y -= 10; }
 function moveDown() { return shooter.y += 10; }
 
-// create active target manually by pressing 'n'
+// active targets can be created manually by pressing 'n'
 window.onkeydown = function(e) {
     let key = e.key || e.keyCode
     console.log('key: ', key);
@@ -261,7 +292,7 @@ window.onkeydown = function(e) {
     }
 }
 
-let showTestTarget = true;
+/*let showTestTarget = true;
 let testTarget = {'x': 290, 'y': 200, 'width': 20, 'height': 20, 'hitPoints': 3}
 function draw_test_target() {
     context.beginPath();
@@ -274,7 +305,7 @@ function draw_test_target() {
     context.lineTo(testTarget.x, testTarget.y + testTarget.height);
     context.fill();
     context.stroke();
-}
+}*/
 
 let activeTargetList = [];
 function ActiveTarget(x, y, hitPoints) {
@@ -415,11 +446,17 @@ function frame(timestamp) {
     if (counter%180 == 0) {
         create_small_dumb_enemy();
         console.log("smallBumbEnemyList:", smallDumbEnemyList.length);
+        create_medium_simple_enemy();
     }
     draw_shooter(shooter);  // moving shooter
     if (smallDumbEnemyList.length > 0) {
         for (let i=0; i<smallDumbEnemyList.length; i++) {
             draw_small_dumb_enemy(smallDumbEnemyList[i]);
+        }
+    }
+    if (mediumSimpleEnemyList.length > 0) {
+        for (let i=0; i<mediumSimpleEnemyList.length; i++) {
+            draw_medium_simple_enemy(mediumSimpleEnemyList[i]);
         }
     }
     go_through_active_target_list();
