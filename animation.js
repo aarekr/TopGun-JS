@@ -80,8 +80,6 @@ function draw_asteroid_static(dy_asteroid_static) {
     context.stroke();
 }
 
-//let asteroidi = new Asteroid(24, 30, 0.2);
-//console.log(asteroidi);
 let asteroid_list = [
     new Asteroid(10, 50, 0.2),
     new Asteroid(20, 30, 0.2),
@@ -239,7 +237,7 @@ function draw_bullet(bullet) {
     }
 }
 let bulletListIteratorFirst = 0;
-function handle_bullet_positions(bulletList) {
+function handle_bullet_positions() {
     for (let i=bulletListIteratorFirst; i<bulletList.length; i++) {
         if (bulletList[i].y < -20) {
             bulletListIteratorFirst++;
@@ -248,7 +246,7 @@ function handle_bullet_positions(bulletList) {
     }
 }
 
-let side_missile_list = [];
+let sideMissileList = [];
 function SideMissile(direction, target_pointer) {
     this.x = shooter.x;
     this.y = shooter.y+15;
@@ -259,7 +257,7 @@ function SideMissile(direction, target_pointer) {
 
 function shoot_side_missile(direction, target_pointer) {
     let side_missile = new SideMissile(direction, target_pointer);
-    side_missile_list.push(side_missile);
+    sideMissileList.push(side_missile);
 }
 
 function draw_side_missile(side_missile) {
@@ -291,9 +289,9 @@ function draw_side_missile(side_missile) {
 }
 
 let sideMissileListIteratorFirst = 0;
-function handle_side_missile_positions(side_missile_list) {
-    for (let i = 0; i < side_missile_list.length; i++) {
-        draw_side_missile(side_missile_list[i]);
+function handle_side_missile_positions() {
+    for (let i = 0; i < sideMissileList.length; i++) {
+        draw_side_missile(sideMissileList[i]);
     }
 }
 
@@ -313,21 +311,6 @@ window.onkeydown = function(e) {
     }
 }
 
-/*let showTestTarget = true;
-let testTarget = {'x': 290, 'y': 200, 'width': 20, 'height': 20, 'hitPoints': 3}
-function draw_test_target() {
-    context.beginPath();
-    context.strokeStyle = '#FFFFFF';
-    context.fillStyle = '#FFFFFF';
-    context.lineWidth = 2;
-    context.moveTo(testTarget.x, testTarget.y);
-    context.lineTo(testTarget.x + testTarget.width, testTarget.y);
-    context.lineTo(testTarget.x + testTarget.width, testTarget.y + testTarget.height);
-    context.lineTo(testTarget.x, testTarget.y + testTarget.height);
-    context.fill();
-    context.stroke();
-}*/
-
 let activeTargetList = [];
 function ActiveTarget(x, y, hitPoints) {
     this.x = x;
@@ -341,12 +324,10 @@ function create_active_target() {
     let hitPoints = 1 + Math.floor(3 * Math.random());
     let new_target = new ActiveTarget(x, y, hitPoints);
     activeTargetList.push(new_target);
-    //console.log('activeTargetList:', activeTargetList);
 }
 
 function draw_active_targets() {
     for (let i=0; i<activeTargetList.length; i++) {
-        //console.log('draw_active_targets:', activeTargetList[i].hitPoints);
         if (activeTargetList[i].hitPoints < 1) continue;
         context.beginPath();
         context.strokeStyle = '#FFFFFF';
@@ -363,15 +344,6 @@ function draw_active_targets() {
 }
 
 function check_collisions_bullets_items() {
-    /* //test target
-    for (let j=0; j<bulletList.length; j++) {
-        if (bulletList[j].x < testTarget.x+testTarget.width && testTarget.x < bulletList[j].x) {
-            if (bulletList[j].y < testTarget.y+testTarget.height && testTarget.y < bulletList[j].y) {
-                testTarget.hitpoints--;
-                bulletList[j].hit = true;
-            }
-        }
-    }*/
     // bullets - targets
     for (let j=0; j<bulletList.length; j++) {
         if (bulletList[j].hit == true) continue;
@@ -386,14 +358,14 @@ function check_collisions_bullets_items() {
         }
     }
     // side missiles - targets
-    for (let j=0; j<side_missile_list.length; j++) {
-        if (side_missile_list[j].hit == true) continue;
+    for (let j=0; j<sideMissileList.length; j++) {
+        if (sideMissileList[j].hit == true) continue;
         for (let i=0; i<activeTargetList.length; i++) {
             if (activeTargetList[i].hitPoints <=0) continue;
-            if (side_missile_list[j].x < activeTargetList[i].x+40 && activeTargetList[i].x < side_missile_list[j].x) {
-                if (side_missile_list[j].y < activeTargetList[i].y+40 && activeTargetList[i].y < side_missile_list[j].y) {
+            if (sideMissileList[j].x < activeTargetList[i].x+40 && activeTargetList[i].x < sideMissileList[j].x) {
+                if (sideMissileList[j].y < activeTargetList[i].y+40 && activeTargetList[i].y < sideMissileList[j].y) {
                     activeTargetList[i].hitPoints--;
-                    side_missile_list[j].hit = true;
+                    sideMissileList[j].hit = true;
                 }
             }
         }
@@ -403,15 +375,12 @@ function check_collisions_bullets_items() {
 let active_target_pointer = 0;
 function go_through_active_target_list() {
     if (activeTargetList[active_target_pointer] != undefined) {
-        //console.log('active target:', activeTargetList[active_target_pointer]);
         let difference = shooter.x - (activeTargetList[active_target_pointer].x+40/2);
-        //console.log("difference:", difference);
         if (difference > 0 && difference <=200) shooter.x -= 2;
         else if (difference < 0 && difference >= -200) shooter.x += 2;
         else if (difference > 200) {  // shooting left side missile
             let time = 0;
             for (let i=0; i<activeTargetList[active_target_pointer].hitPoints; i++) {
-                //console.log("activeTargetList[active_target_pointer]:", activeTargetList[active_target_pointer]);
                 let target_pointer = active_target_pointer;
                 setTimeout(() => shoot_side_missile("left", target_pointer), time);
                 time += 30;
@@ -421,7 +390,6 @@ function go_through_active_target_list() {
         else if (difference < -200) {  // shooting right side missile
             let time = 0;
             for (let i=0; i<activeTargetList[active_target_pointer].hitPoints; i++) {
-                //console.log("activeTargetList[active_target_pointer]:", activeTargetList[active_target_pointer]);
                 let target_pointer = active_target_pointer;
                 setTimeout(() => shoot_side_missile("right", target_pointer), time);
                 time += 30;
@@ -482,16 +450,15 @@ function frame(timestamp) {
         }
     }
     go_through_active_target_list();
-    //if (showTestTarget == true && testTarget.hitPoints > 0) draw_test_target();
     //draw_asteroid_static(dy_asteroid_static);
     //draw_asteroid_dumb(dy_asteroid_dumb);
     //draw_enemy_small_dumb(dy_small_dumb);
     //draw_three_small_dumb_enemies(dy_small_dumb);  // uncommented, remove
     draw_new_design();
     draw_active_targets();
-    handle_bullet_positions(bulletList);  // parameter not necessary?
+    handle_bullet_positions();
     handle_enemy_bullet_positions();
-    handle_side_missile_positions(side_missile_list);
+    handle_side_missile_positions();
     check_collisions_bullets_items();
     //draw_asteroid_object(asteroidi);
     //asteroid_list.forEach(a => draw_asteroid_object(a))
