@@ -88,18 +88,6 @@ let asteroid_list = [
     new Asteroid(40, 40, 0.2)
 ]
 
-/*function draw_enemy_small_dumb(dy) {
-    context.beginPath();
-    context.strokeStyle = '#FFFFFF';
-    context.fillStyle = '#FFFFFF';
-    context.lineWidth = 2;
-    context.moveTo(100, 0 + dy);
-    context.lineTo(110, -20 + dy);
-    context.lineTo(90, -20 + dy);
-    context.fill();
-    context.stroke();
-}*/
-
 /*let enemyList = [[350,0], [400,0], [450,0]];
 function draw_three_small_dumb_enemies(dy) {
     for (let i=0; i<enemyList.length; i++) {
@@ -116,7 +104,7 @@ function draw_three_small_dumb_enemies(dy) {
 }*/
 
 function Shooter() {
-    this.x = 200;
+    this.x = 300;
     this.y = 520;
 }
 let shooter = new Shooter();
@@ -189,6 +177,39 @@ function draw_medium_simple_enemy(enemy) {
         context.lineTo(enemy.x-20, enemy.y-40);
         context.fill();
         context.stroke();
+    }
+}
+
+let enemyBulletList = [];
+function EnemyBullet() {
+    this.x = 100;
+    this.y = 50;
+    this.hit = false;
+}
+function shoot_enemy_bullet() {
+    let bullet = new EnemyBullet();
+    enemyBulletList.push(bullet);
+}
+function draw_enemy_bullet(bullet) {
+    if (bullet.hit == false) {
+        context.beginPath();
+        context.strokeStyle = '#FFFFFF';
+        context.fillStyle = '#FFFFFF';
+        context.lineWidth = 6;
+        context.moveTo(bullet.x, bullet.y);
+        bullet.y += 3;
+        context.lineTo(bullet.x, bullet.y);
+        context.fill();
+        context.stroke();
+    }
+}
+let enemyBulletListIteratorFirst = 0;
+function handle_enemy_bullet_positions() {
+    for (let i=enemyBulletListIteratorFirst; i<enemyBulletList.length; i++) {
+        if (enemyBulletList[i].y > 700) {
+            enemyBulletListIteratorFirst++;
+        }
+        draw_enemy_bullet(enemyBulletList[i]);
     }
 }
 
@@ -442,6 +463,7 @@ function frame(timestamp) {
     counter++;
     if (counter%60 == 0) {  // creating an active target every 3 seconds
         create_active_target();
+        shoot_enemy_bullet();
     }
     if (counter%180 == 0) {
         create_small_dumb_enemy();
@@ -456,7 +478,7 @@ function frame(timestamp) {
     }
     if (mediumSimpleEnemyList.length > 0) {
         for (let i=0; i<mediumSimpleEnemyList.length; i++) {
-            draw_medium_simple_enemy(mediumSimpleEnemyList[i]);
+            //draw_medium_simple_enemy(mediumSimpleEnemyList[i]);
         }
     }
     go_through_active_target_list();
@@ -467,7 +489,8 @@ function frame(timestamp) {
     //draw_three_small_dumb_enemies(dy_small_dumb);  // uncommented, remove
     draw_new_design();
     draw_active_targets();
-    handle_bullet_positions(bulletList);
+    handle_bullet_positions(bulletList);  // parameter not necessary?
+    handle_enemy_bullet_positions();
     handle_side_missile_positions(side_missile_list);
     check_collisions_bullets_items();
     //draw_asteroid_object(asteroidi);
