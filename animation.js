@@ -169,7 +169,7 @@ function draw_medium_simple_enemy(enemy) {
         if (enemy.moveDirection == "right") enemy.x++;
         else if (enemy.moveDirection == "left") enemy.x--;
         if (enemy.x >= 550) enemy.moveDirection = "left";
-        else if (enemy.x <= 200) enemy,moveDirection = "right";
+        else if (enemy.x <= 50) enemy.moveDirection = "right";
         context.moveTo(enemy.x, enemy.y);
         context.lineTo(enemy.x+20, enemy.y-40);
         context.lineTo(enemy.x-20, enemy.y-40);
@@ -179,13 +179,13 @@ function draw_medium_simple_enemy(enemy) {
 }
 
 let enemyBulletList = [];
-function EnemyBullet() {
-    this.x = 100;
-    this.y = 50;
+function EnemyBullet(x) {
+    this.x = x;
+    this.y = 70;
     this.hit = false;
 }
-function shoot_enemy_bullet() {
-    let bullet = new EnemyBullet();
+function shoot_enemy_bullet(x) {
+    let bullet = new EnemyBullet(x);
     enemyBulletList.push(bullet);
 }
 function draw_enemy_bullet(bullet) {
@@ -431,11 +431,15 @@ function frame(timestamp) {
     counter++;
     if (counter%60 == 0) {  // creating an active target every 3 seconds
         create_active_target();
-        shoot_enemy_bullet();
+        shoot_enemy_bullet(100);
     }
-    if (counter%180 == 0) {
+    if (counter%240 == 0) {
         create_small_dumb_enemy();
-        console.log("smallBumbEnemyList:", smallDumbEnemyList.length);
+        //console.log("smallBumbEnemyList:", smallDumbEnemyList.length);
+        console.log("mediumSimpleEnemyList:", mediumSimpleEnemyList[0]);
+        shoot_enemy_bullet(mediumSimpleEnemyList[0].x);
+    }
+    if (counter == 10) {  //(counter%360 == 0) {
         create_medium_simple_enemy();
     }
     draw_shooter(shooter);  // moving shooter
@@ -446,7 +450,9 @@ function frame(timestamp) {
     }
     if (mediumSimpleEnemyList.length > 0) {
         for (let i=0; i<mediumSimpleEnemyList.length; i++) {
-            //draw_medium_simple_enemy(mediumSimpleEnemyList[i]);
+            if (mediumSimpleEnemyList[i].hitPoints > 0) {
+                draw_medium_simple_enemy(mediumSimpleEnemyList[i]);
+            }
         }
     }
     go_through_active_target_list();
