@@ -270,14 +270,22 @@ function draw_side_missile(side_missile) {
         //console.log("side_missile:", side_missile.x, side_missile.y);
         //console.log("side_missile target:", activeTargetList[side_missile.target_pointer]);
         side_missile.y -= 5;
-        if (side_missile.x > activeTargetList[side_missile.target_pointer].x + 20) {
-            let difference = side_missile.x - (activeTargetList[side_missile.target_pointer].x + 20);
+        if (smallDumbEnemyList[side_missile.target_pointer] == undefined) {
+            console.log("undefined lista  :", smallDumbEnemyList);
+            console.log("undefined pointer:", side_missile.target_pointer);
+        }
+        if (smallDumbEnemyList[side_missile.target_pointer].x != undefined) {
+            console.log("defined  :", smallDumbEnemyList[side_missile.target_pointer].x);
+        }
+        if (side_missile.x > smallDumbEnemyList[side_missile.target_pointer].x) {
+            console.log("smallDumbEnemyList[side_missile.target_pointer]:", smallDumbEnemyList[side_missile.target_pointer]);
+            let difference = side_missile.x - (smallDumbEnemyList[side_missile.target_pointer].x);
             let delta_x = 7 * difference/100;  // missile x change is relative to target x
             if (delta_x > 7) delta_x = 7;      // missile x change is max 7
             side_missile.x -= delta_x;
         }
-        if (side_missile.x < activeTargetList[side_missile.target_pointer].x + 20) {
-            let difference = (activeTargetList[side_missile.target_pointer].x + 20) - side_missile.x;
+        if (side_missile.x < smallDumbEnemyList[side_missile.target_pointer].x) {
+            let difference = (smallDumbEnemyList[side_missile.target_pointer].x) - side_missile.x;
             let delta_x = 7 * difference/100;  // missile x change is relative to target x
             if (delta_x > 7) delta_x = 7;      // missile x change is max 7
             side_missile.x += delta_x;
@@ -405,6 +413,40 @@ function go_through_active_target_list() {
             active_target_pointer++;
         }
     }
+    // smallDumbEnemyList
+    if (smallDumbEnemyList[active_target_pointer] != undefined) {
+        let difference = shooter.x - (smallDumbEnemyList[active_target_pointer].x);
+        if (difference > 0 && difference <=200) shooter.x -= 2;
+        else if (difference < 0 && difference >= -200) shooter.x += 2;
+        else if (difference > 200) {  // shooting left side missile
+            let time = 0;
+            for (let i=0; i<smallDumbEnemyList[active_target_pointer].hitPoints; i++) {
+                let target_pointer = smallDumbEnemyList;
+                setTimeout(() => shoot_side_missile("left", target_pointer), time);
+                time += 30;
+            }
+            active_target_pointer++;
+        }
+        else if (difference < -200) {  // shooting right side missile
+            let time = 0;
+            for (let i=0; i<smallDumbEnemyList[active_target_pointer].hitPoints; i++) {
+                let target_pointer = active_target_pointer;
+                setTimeout(() => shoot_side_missile("right", target_pointer), time);
+                time += 30;
+            }
+            active_target_pointer++;
+        }
+        if (Math.abs(difference) < 1) {  // shooter pointing at target
+            let time = 0;
+            for (let i=0; i<smallDumbEnemyList[active_target_pointer].hitPoints; i++) {
+                setTimeout(() => shoot_bullet(), time);
+                time += 30;
+            }
+            active_target_pointer++;
+        }
+    }
+    // mediumSimpleEnemyList
+    
 }
 
 function draw_new_design() {
@@ -430,13 +472,13 @@ function frame(timestamp) {
     dy_active_targets++;
     counter++;
     if (counter%60 == 0) {  // creating an active target every 3 seconds
-        create_active_target();
+        //create_active_target();
         shoot_enemy_bullet(100);
     }
     if (counter%240 == 0) {
         create_small_dumb_enemy();
         //console.log("smallBumbEnemyList:", smallDumbEnemyList.length);
-        console.log("mediumSimpleEnemyList:", mediumSimpleEnemyList[0]);
+        //console.log("mediumSimpleEnemyList:", mediumSimpleEnemyList[0]);
         shoot_enemy_bullet(mediumSimpleEnemyList[0].x);
     }
     if (counter == 10) {  //(counter%360 == 0) {
