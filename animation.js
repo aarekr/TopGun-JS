@@ -355,11 +355,11 @@ function check_collisions_bullets_items() {
     // bullets - targets
     for (let j=0; j<bulletList.length; j++) {
         if (bulletList[j].hit == true) continue;
-        for (let i=0; i<activeTargetList.length; i++) {
-            if (activeTargetList[i].hitPoints <=0) continue;
-            if (bulletList[j].x < activeTargetList[i].x+40 && activeTargetList[i].x < bulletList[j].x) {
-                if (bulletList[j].y < activeTargetList[i].y+40 && activeTargetList[i].y < bulletList[j].y) {
-                    activeTargetList[i].hitPoints--;
+        for (let i=0; i<smallDumbEnemyList.length; i++) {
+            if (smallDumbEnemyList[i].hitPoints <=0) continue;
+            if (bulletList[j].x < smallDumbEnemyList[i].x+10 && smallDumbEnemyList[i].x-10 < bulletList[j].x) {
+                if (bulletList[j].y < smallDumbEnemyList[i].y+3 && smallDumbEnemyList[i].y-7 < bulletList[j].y) {
+                    smallDumbEnemyList[i].hitPoints--;
                     bulletList[j].hit = true;
                 }
             }
@@ -368,11 +368,11 @@ function check_collisions_bullets_items() {
     // side missiles - targets
     for (let j=0; j<sideMissileList.length; j++) {
         if (sideMissileList[j].hit == true) continue;
-        for (let i=0; i<activeTargetList.length; i++) {
-            if (activeTargetList[i].hitPoints <=0) continue;
-            if (sideMissileList[j].x < activeTargetList[i].x+40 && activeTargetList[i].x < sideMissileList[j].x) {
-                if (sideMissileList[j].y < activeTargetList[i].y+40 && activeTargetList[i].y < sideMissileList[j].y) {
-                    activeTargetList[i].hitPoints--;
+        for (let i=0; i<smallDumbEnemyList.length; i++) {
+            if (smallDumbEnemyList[i].hitPoints <=0) continue;
+            if (sideMissileList[j].x < smallDumbEnemyList[i].x+10 && smallDumbEnemyList[i].x-10 < sideMissileList[j].x) {
+                if (sideMissileList[j].y < smallDumbEnemyList[i].y+3 && smallDumbEnemyList[i].y-7 < sideMissileList[j].y) {
+                    smallDumbEnemyList[i].hitPoints--;
                     sideMissileList[j].hit = true;
                 }
             }
@@ -382,7 +382,7 @@ function check_collisions_bullets_items() {
 
 let active_target_pointer = 0;
 function go_through_active_target_list() {
-    if (activeTargetList[active_target_pointer] != undefined) {
+    /*if (activeTargetList[active_target_pointer] != undefined) {
         let difference = shooter.x - (activeTargetList[active_target_pointer].x+40/2);
         if (difference > 0 && difference <=200) shooter.x -= 2;
         else if (difference < 0 && difference >= -200) shooter.x += 2;
@@ -412,7 +412,7 @@ function go_through_active_target_list() {
             }
             active_target_pointer++;
         }
-    }
+    }*/
     // smallDumbEnemyList
     if (smallDumbEnemyList[active_target_pointer] != undefined) {
         let difference = shooter.x - (smallDumbEnemyList[active_target_pointer].x);
@@ -446,7 +446,6 @@ function go_through_active_target_list() {
         }
     }
     // mediumSimpleEnemyList
-    
 }
 
 function draw_new_design() {
