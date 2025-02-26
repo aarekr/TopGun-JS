@@ -178,6 +178,44 @@ function draw_medium_simple_enemy(enemy) {
     }
 }
 
+let chapterMainEnemy;
+function ChapterMainEnemy() {
+    this.x = 300;
+    this.y = 0;
+    this.hitPoints = 1000;
+    this.moveDirection = "left";
+}
+
+function create_chapter_main_enemy() {
+    chapterMainEnemy = new ChapterMainEnemy();
+}
+
+function draw_chapter_main_enemy() {
+    if (chapterMainEnemy.hitPoints > 0) {
+        context.beginPath();
+        context.strokeStyle = '#FFFFFF';
+        context.fillStyle = '#FFFFFF';
+        context.lineWidth = 5;
+        if (chapterMainEnemy.y <= 100) {
+            chapterMainEnemy.y = chapterMainEnemy.y + 0.2;
+        }
+        if (chapterMainEnemy.y >= 99) {
+            if (chapterMainEnemy.moveDirection == "right") chapterMainEnemy.x = chapterMainEnemy.x + 0.5;
+            else if (chapterMainEnemy.moveDirection == "left") chapterMainEnemy.x = chapterMainEnemy.x - 0.5;
+            if (chapterMainEnemy.x >= 400) chapterMainEnemy.moveDirection = "left";
+            else if (chapterMainEnemy.x <= 200) chapterMainEnemy.moveDirection = "right";
+        }
+        context.moveTo(chapterMainEnemy.x, chapterMainEnemy.y);
+        context.lineTo(chapterMainEnemy.x+50, chapterMainEnemy.y-20);
+        context.lineTo(chapterMainEnemy.x+50, chapterMainEnemy.y-80);
+        context.lineTo(chapterMainEnemy.x-50, chapterMainEnemy.y-80);
+        context.lineTo(chapterMainEnemy.x-50, chapterMainEnemy.y-20);
+        context.lineTo(chapterMainEnemy.x, chapterMainEnemy.y);
+        context.fill();
+        context.stroke();
+    }
+}
+
 let enemyBulletList = [];
 function EnemyBullet(x) {
     this.x = x;
@@ -261,35 +299,41 @@ function shoot_side_missile(direction, target_pointer) {
 }
 
 function draw_side_missile(side_missile) {
-    if (side_missile.hit == false && side_missile.x > -40 && side_missile.y > -40) {
+    if (side_missile.hit == false && side_missile.y > -40) {
         context.beginPath();
         context.strokeStyle = '#FFFFFF';
         context.fillStyle = '#FFFFFF';
         context.lineWidth = 2;
         context.moveTo(side_missile.x, side_missile.y);
-        //console.log("side_missile:", side_missile.x, side_missile.y);
-        //console.log("side_missile target:", activeTargetList[side_missile.target_pointer]);
+        console.log("side_missile:", side_missile.x, side_missile.y);
+        console.log("0");
+        console.log("smallDumbEnemyList[side_missile.target_pointer]", smallDumbEnemyList[side_missile.target_pointer]);
+        console.log("side_missile.target_pointer:", side_missile.target_pointer);
         side_missile.y -= 5;
+        console.log("1");
         if (smallDumbEnemyList[side_missile.target_pointer] == undefined) {
             console.log("undefined lista  :", smallDumbEnemyList);
             console.log("undefined pointer:", side_missile.target_pointer);
         }
+        console.log("2");
         if (smallDumbEnemyList[side_missile.target_pointer].x != undefined) {
             console.log("defined  :", smallDumbEnemyList[side_missile.target_pointer].x);
         }
+        console.log("3");
         if (side_missile.x > smallDumbEnemyList[side_missile.target_pointer].x) {
-            console.log("smallDumbEnemyList[side_missile.target_pointer]:", smallDumbEnemyList[side_missile.target_pointer]);
             let difference = side_missile.x - (smallDumbEnemyList[side_missile.target_pointer].x);
             let delta_x = 7 * difference/100;  // missile x change is relative to target x
             if (delta_x > 7) delta_x = 7;      // missile x change is max 7
             side_missile.x -= delta_x;
         }
+        console.log("4");
         if (side_missile.x < smallDumbEnemyList[side_missile.target_pointer].x) {
             let difference = (smallDumbEnemyList[side_missile.target_pointer].x) - side_missile.x;
             let delta_x = 7 * difference/100;  // missile x change is relative to target x
             if (delta_x > 7) delta_x = 7;      // missile x change is max 7
             side_missile.x += delta_x;
         }
+        console.log("5");
         context.lineTo(side_missile.x, side_missile.y);
         context.fill();
         context.stroke();
@@ -482,6 +526,7 @@ function frame(timestamp) {
     }
     if (counter == 10) {  //(counter%360 == 0) {
         create_medium_simple_enemy();
+        create_chapter_main_enemy();
     }
     draw_shooter(shooter);  // moving shooter
     if (smallDumbEnemyList.length > 0) {
@@ -503,6 +548,9 @@ function frame(timestamp) {
     //draw_three_small_dumb_enemies(dy_small_dumb);  // uncommented, remove
     draw_new_design();
     draw_active_targets();
+    if (chapterMainEnemy != undefined) {
+        draw_chapter_main_enemy();
+    }
     handle_bullet_positions();
     handle_enemy_bullet_positions();
     handle_side_missile_positions();
