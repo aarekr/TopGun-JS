@@ -187,7 +187,7 @@ function ChapterMainEnemy() {
 }
 
 function create_chapter_main_enemy() {
-    chapterMainEnemy = new ChapterMainEnemy();
+   chapterMainEnemy = new ChapterMainEnemy();
 }
 
 function draw_chapter_main_enemy() {
@@ -305,35 +305,19 @@ function draw_side_missile(side_missile) {
         context.fillStyle = '#FFFFFF';
         context.lineWidth = 2;
         context.moveTo(side_missile.x, side_missile.y);
-        console.log("side_missile:", side_missile.x, side_missile.y);
-        console.log("0");
-        console.log("smallDumbEnemyList[side_missile.target_pointer]", smallDumbEnemyList[side_missile.target_pointer]);
-        console.log("side_missile.target_pointer:", side_missile.target_pointer);
         side_missile.y -= 5;
-        console.log("1");
-        if (smallDumbEnemyList[side_missile.target_pointer] == undefined) {
-            console.log("undefined lista  :", smallDumbEnemyList);
-            console.log("undefined pointer:", side_missile.target_pointer);
-        }
-        console.log("2");
-        if (smallDumbEnemyList[side_missile.target_pointer].x != undefined) {
-            console.log("defined  :", smallDumbEnemyList[side_missile.target_pointer].x);
-        }
-        console.log("3");
         if (side_missile.x > smallDumbEnemyList[side_missile.target_pointer].x) {
             let difference = side_missile.x - (smallDumbEnemyList[side_missile.target_pointer].x);
             let delta_x = 7 * difference/100;  // missile x change is relative to target x
             if (delta_x > 7) delta_x = 7;      // missile x change is max 7
             side_missile.x -= delta_x;
         }
-        console.log("4");
         if (side_missile.x < smallDumbEnemyList[side_missile.target_pointer].x) {
             let difference = (smallDumbEnemyList[side_missile.target_pointer].x) - side_missile.x;
             let delta_x = 7 * difference/100;  // missile x change is relative to target x
             if (delta_x > 7) delta_x = 7;      // missile x change is max 7
             side_missile.x += delta_x;
         }
-        console.log("5");
         context.lineTo(side_missile.x, side_missile.y);
         context.fill();
         context.stroke();
@@ -363,46 +347,14 @@ window.onkeydown = function(e) {
     }
 }
 
-let activeTargetList = [];
-function ActiveTarget(x, y, hitPoints) {
-    this.x = x;
-    this.y = y;
-    this.hitPoints = hitPoints;
-    this.show = true;
-}
-function create_active_target() {
-    let x = 50 + 500 * Math.random();
-    let y = -30;
-    let hitPoints = 1 + Math.floor(3 * Math.random());
-    let new_target = new ActiveTarget(x, y, hitPoints);
-    activeTargetList.push(new_target);
-}
-
-function draw_active_targets() {
-    for (let i=0; i<activeTargetList.length; i++) {
-        if (activeTargetList[i].hitPoints < 1) continue;
-        context.beginPath();
-        context.strokeStyle = '#FFFFFF';
-        context.fillStyle = '#FFFFFF';
-        context.lineWidth = 2;
-        activeTargetList[i].y += 1;
-        context.moveTo(activeTargetList[i].x, activeTargetList[i].y);
-        context.lineTo(activeTargetList[i].x + 40, activeTargetList[i].y);
-        context.lineTo(activeTargetList[i].x + 40, activeTargetList[i].y + 40);
-        context.lineTo(activeTargetList[i].x, activeTargetList[i].y + 40);
-        context.fill();
-        context.stroke();
-    }
-}
-
-function check_collisions_bullets_items() {
+function check_collisions_bullets_missiles_items() {
     // bullets - targets
     for (let j=0; j<bulletList.length; j++) {
         if (bulletList[j].hit == true) continue;
         for (let i=0; i<smallDumbEnemyList.length; i++) {
             if (smallDumbEnemyList[i].hitPoints <=0) continue;
-            if (bulletList[j].x < smallDumbEnemyList[i].x+10 && smallDumbEnemyList[i].x-10 < bulletList[j].x) {
-                if (bulletList[j].y < smallDumbEnemyList[i].y+3 && smallDumbEnemyList[i].y-7 < bulletList[j].y) {
+            if (bulletList[j].x <= smallDumbEnemyList[i].x+10 && smallDumbEnemyList[i].x-10 <= bulletList[j].x) {
+                if (bulletList[j].y <= smallDumbEnemyList[i].y+3 && smallDumbEnemyList[i].y-10 <= bulletList[j].y) {
                     smallDumbEnemyList[i].hitPoints--;
                     bulletList[j].hit = true;
                 }
@@ -414,8 +366,8 @@ function check_collisions_bullets_items() {
         if (sideMissileList[j].hit == true) continue;
         for (let i=0; i<smallDumbEnemyList.length; i++) {
             if (smallDumbEnemyList[i].hitPoints <=0) continue;
-            if (sideMissileList[j].x < smallDumbEnemyList[i].x+10 && smallDumbEnemyList[i].x-10 < sideMissileList[j].x) {
-                if (sideMissileList[j].y < smallDumbEnemyList[i].y+3 && smallDumbEnemyList[i].y-7 < sideMissileList[j].y) {
+            if (sideMissileList[j].x <= smallDumbEnemyList[i].x+10 && smallDumbEnemyList[i].x-10 <= sideMissileList[j].x) {
+                if (sideMissileList[j].y <= smallDumbEnemyList[i].y+3 && smallDumbEnemyList[i].y-10 <= sideMissileList[j].y) {
                     smallDumbEnemyList[i].hitPoints--;
                     sideMissileList[j].hit = true;
                 }
@@ -424,69 +376,40 @@ function check_collisions_bullets_items() {
     }
 }
 
-let active_target_pointer = 0;
+let active_small_target_pointer = 0;
+let active_medium_target_pointer = 0;
+let active_chapter_enemy_target_pointer = 0;
 function go_through_active_target_list() {
-    /*if (activeTargetList[active_target_pointer] != undefined) {
-        let difference = shooter.x - (activeTargetList[active_target_pointer].x+40/2);
-        if (difference > 0 && difference <=200) shooter.x -= 2;
-        else if (difference < 0 && difference >= -200) shooter.x += 2;
-        else if (difference > 200) {  // shooting left side missile
-            let time = 0;
-            for (let i=0; i<activeTargetList[active_target_pointer].hitPoints; i++) {
-                let target_pointer = active_target_pointer;
-                setTimeout(() => shoot_side_missile("left", target_pointer), time);
-                time += 30;
-            }
-            active_target_pointer++;
-        }
-        else if (difference < -200) {  // shooting right side missile
-            let time = 0;
-            for (let i=0; i<activeTargetList[active_target_pointer].hitPoints; i++) {
-                let target_pointer = active_target_pointer;
-                setTimeout(() => shoot_side_missile("right", target_pointer), time);
-                time += 30;
-            }
-            active_target_pointer++;
-        }
-        if (Math.abs(difference) < 1) {  // shooter pointing at target
-            let time = 0;
-            for (let i=0; i<activeTargetList[active_target_pointer].hitPoints; i++) {
-                setTimeout(() => shoot_bullet(), time);
-                time += 30;
-            }
-            active_target_pointer++;
-        }
-    }*/
     // smallDumbEnemyList
-    if (smallDumbEnemyList[active_target_pointer] != undefined) {
-        let difference = shooter.x - (smallDumbEnemyList[active_target_pointer].x);
+    if (smallDumbEnemyList[active_small_target_pointer] != undefined) {
+        let difference = shooter.x - (smallDumbEnemyList[active_small_target_pointer].x);
         if (difference > 0 && difference <=200) shooter.x -= 2;
         else if (difference < 0 && difference >= -200) shooter.x += 2;
         else if (difference > 200) {  // shooting left side missile
             let time = 0;
-            for (let i=0; i<smallDumbEnemyList[active_target_pointer].hitPoints; i++) {
-                let target_pointer = smallDumbEnemyList;
+            for (let i=0; i<smallDumbEnemyList[active_small_target_pointer].hitPoints; i++) {
+                let target_pointer = active_small_target_pointer;
                 setTimeout(() => shoot_side_missile("left", target_pointer), time);
                 time += 30;
             }
-            active_target_pointer++;
+            active_small_target_pointer++;
         }
         else if (difference < -200) {  // shooting right side missile
             let time = 0;
-            for (let i=0; i<smallDumbEnemyList[active_target_pointer].hitPoints; i++) {
-                let target_pointer = active_target_pointer;
+            for (let i=0; i<smallDumbEnemyList[active_small_target_pointer].hitPoints; i++) {
+                let target_pointer = active_small_target_pointer;
                 setTimeout(() => shoot_side_missile("right", target_pointer), time);
                 time += 30;
             }
-            active_target_pointer++;
+            active_small_target_pointer++;
         }
         if (Math.abs(difference) < 1) {  // shooter pointing at target
             let time = 0;
-            for (let i=0; i<smallDumbEnemyList[active_target_pointer].hitPoints; i++) {
+            for (let i=0; i<smallDumbEnemyList[active_small_target_pointer].hitPoints; i++) {
                 setTimeout(() => shoot_bullet(), time);
                 time += 30;
             }
-            active_target_pointer++;
+            active_small_target_pointer++;
         }
     }
     // mediumSimpleEnemyList
@@ -508,7 +431,6 @@ function frame(timestamp) {
     context.clearRect(0, 0, context.canvas.width, context.canvas.height);
     if (!previous) previous = timestamp;
     elapsed = timestamp - previous;
-    //dx--;
     dy_asteroid_dumb += 2;
     dy_asteroid_static += 0.0;
     dy_small_dumb++;
@@ -541,20 +463,20 @@ function frame(timestamp) {
             }
         }
     }
+    if (chapterMainEnemy != undefined) {
+        draw_chapter_main_enemy();
+    }
     go_through_active_target_list();
     //draw_asteroid_static(dy_asteroid_static);
     //draw_asteroid_dumb(dy_asteroid_dumb);
     //draw_enemy_small_dumb(dy_small_dumb);
     //draw_three_small_dumb_enemies(dy_small_dumb);  // uncommented, remove
     draw_new_design();
-    draw_active_targets();
-    if (chapterMainEnemy != undefined) {
-        draw_chapter_main_enemy();
-    }
+    //draw_active_targets();
     handle_bullet_positions();
     handle_enemy_bullet_positions();
     handle_side_missile_positions();
-    check_collisions_bullets_items();
+    check_collisions_bullets_missiles_items();
     //draw_asteroid_object(asteroidi);
     //asteroid_list.forEach(a => draw_asteroid_object(a))
     previous = timestamp;
