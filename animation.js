@@ -226,6 +226,21 @@ function shoot_enemy_bullet(x) {
     let bullet = new EnemyBullet(x);
     enemyBulletList.push(bullet);
 }
+let enemyDirectionalBulletList = [];
+function EnemyDirectionalBullet(x) {
+    this.x = x;
+    this.y = 70;
+    console.log("shooter position:", shooter);
+    this.x_multiplier = (shooter.x - this.x) / 100;
+    this.y_multiplier = (shooter.y - this.y) / 100;
+    console.log("multiplier x:", this.x_multiplier);
+    console.log("multiplier y:", this.y_multiplier);
+    this.hit = false;
+}
+function shoot_enemy_bullet_towards_shooter(x) {
+    let bullet = new EnemyDirectionalBullet(x);
+    enemyDirectionalBulletList.push(bullet);
+}
 function draw_enemy_bullet(bullet) {
     if (bullet.hit == false) {
         context.beginPath();
@@ -234,6 +249,20 @@ function draw_enemy_bullet(bullet) {
         context.lineWidth = 6;
         context.moveTo(bullet.x, bullet.y);
         bullet.y += 3;
+        context.lineTo(bullet.x, bullet.y);
+        context.fill();
+        context.stroke();
+    }
+}
+function draw_enemy_directional_bullet(bullet) {
+    if (bullet.hit == false) {
+        context.beginPath();
+        context.strokeStyle = '#FFFFFF';
+        context.fillStyle = '#FFFFFF';
+        context.lineWidth = 6;
+        context.moveTo(bullet.x, bullet.y);
+        bullet.x += bullet.x_multiplier * 0.95;
+        bullet.y += bullet.y_multiplier;
         context.lineTo(bullet.x, bullet.y);
         context.fill();
         context.stroke();
@@ -248,7 +277,17 @@ function handle_enemy_bullet_positions() {
         draw_enemy_bullet(enemyBulletList[i]);
     }
 }
+let enemyDirectionalBulletListIteratorFirst = 0;
+function handle_enemy_directional_bullet_positions() {
+    for (let i=enemyDirectionalBulletListIteratorFirst; i<enemyDirectionalBulletList.length; i++) {
+        if (enemyDirectionalBulletList[i].y > 700) {
+            enemyDirectionalBulletListIteratorFirst++;
+        }
+        draw_enemy_directional_bullet(enemyDirectionalBulletList[i]);
+    }
+}
 
+// bullets shot by shooter
 let bulletList = [];
 function Bullet() {
     this.x = shooter.x;
@@ -342,7 +381,7 @@ window.onkeydown = function(e) {
     console.log('key: ', key);
     switch(key) {
         case 'n':
-            create_active_target();
+            create_small_dumb_enemy();
             break;
     }
 }
@@ -439,6 +478,7 @@ function frame(timestamp) {
     if (counter%60 == 0) {  // creating an active target every 3 seconds
         //create_active_target();
         shoot_enemy_bullet(100);
+        shoot_enemy_bullet_towards_shooter(100);
     }
     if (counter%240 == 0) {
         create_small_dumb_enemy();
@@ -473,8 +513,9 @@ function frame(timestamp) {
     //draw_three_small_dumb_enemies(dy_small_dumb);  // uncommented, remove
     draw_new_design();
     //draw_active_targets();
-    handle_bullet_positions();
     handle_enemy_bullet_positions();
+    handle_enemy_directional_bullet_positions();
+    handle_bullet_positions();
     handle_side_missile_positions();
     check_collisions_bullets_missiles_items();
     //draw_asteroid_object(asteroidi);
