@@ -228,16 +228,17 @@ function shoot_enemy_bullet(x) {
 }
 let enemyDirectionalBulletList = [];
 function EnemyDirectionalBullet(x) {
-    this.x = x;
-    this.y = 70;
+    this.x = mediumSimpleEnemyList[mediumSimpleEnemyList.length-1].x;
+    this.y = mediumSimpleEnemyList[mediumSimpleEnemyList.length-1].y;
     console.log("shooter position:", shooter);
+    console.log("medium size enemy position:", mediumSimpleEnemyList[mediumSimpleEnemyList.length-1].x);
     this.x_multiplier = (shooter.x - this.x) / 100;
     this.y_multiplier = (shooter.y - this.y) / 100;
     console.log("multiplier x:", this.x_multiplier);
     console.log("multiplier y:", this.y_multiplier);
     this.hit = false;
 }
-function shoot_enemy_bullet_towards_shooter(x) {
+function shoot_enemy_directional_bullet(x) {
     let bullet = new EnemyDirectionalBullet(x);
     enemyDirectionalBulletList.push(bullet);
 }
@@ -475,15 +476,14 @@ function frame(timestamp) {
     dy_small_dumb++;
     dy_active_targets++;
     counter++;
-    if (counter%60 == 0) {  // creating an active target every 3 seconds
-        //create_active_target();
+    if (counter%60 == 0) {
         shoot_enemy_bullet(100);
-        shoot_enemy_bullet_towards_shooter(100);
+    }
+    if (counter%120 == 0) {
+        shoot_enemy_directional_bullet();  // medium sideways moving enemy
     }
     if (counter%240 == 0) {
         create_small_dumb_enemy();
-        //console.log("smallBumbEnemyList:", smallDumbEnemyList.length);
-        //console.log("mediumSimpleEnemyList:", mediumSimpleEnemyList[0]);
         shoot_enemy_bullet(mediumSimpleEnemyList[0].x);
     }
     if (counter == 10) {  //(counter%360 == 0) {
