@@ -226,22 +226,35 @@ function shoot_enemy_bullet(x) {
     let bullet = new EnemyBullet(x);
     enemyBulletList.push(bullet);
 }
+
 let enemyDirectionalBulletList = [];
 function EnemyDirectionalBullet(x) {
     this.x = mediumSimpleEnemyList[mediumSimpleEnemyList.length-1].x;
     this.y = mediumSimpleEnemyList[mediumSimpleEnemyList.length-1].y;
-    console.log("shooter position:", shooter);
-    console.log("medium size enemy position:", mediumSimpleEnemyList[mediumSimpleEnemyList.length-1].x);
     this.x_multiplier = (shooter.x - this.x) / 100;
     this.y_multiplier = (shooter.y - this.y) / 100;
-    console.log("multiplier x:", this.x_multiplier);
-    console.log("multiplier y:", this.y_multiplier);
     this.hit = false;
 }
 function shoot_enemy_directional_bullet(x) {
     let bullet = new EnemyDirectionalBullet(x);
     enemyDirectionalBulletList.push(bullet);
 }
+
+let enemyChapterMainTripleBulletList = [];
+function EnemyChapterMainBullet(x, y) {
+    this.x = x;
+    this.y = y;
+    this.hit = false;
+}
+function shoot_chapter_main_enemy_triple_bullets() {
+    let bullet1 = new EnemyChapterMainBullet(chapterMainEnemy.x-50, chapterMainEnemy.y-20);
+    let bullet2 = new EnemyChapterMainBullet(chapterMainEnemy.x, chapterMainEnemy.y);
+    let bullet3 = new EnemyChapterMainBullet(chapterMainEnemy.x+50, chapterMainEnemy.y-20);
+    enemyChapterMainTripleBulletList.push(bullet1);
+    enemyChapterMainTripleBulletList.push(bullet2);
+    enemyChapterMainTripleBulletList.push(bullet3);
+}
+
 function draw_enemy_bullet(bullet) {
     if (bullet.hit == false) {
         context.beginPath();
@@ -269,6 +282,20 @@ function draw_enemy_directional_bullet(bullet) {
         context.stroke();
     }
 }
+function draw_enemy_chapter_main_triple_bullets(bullet) {
+    if (bullet.hit == false) {
+        context.beginPath();
+        context.strokeStyle = '#FFFFFF';
+        context.fillStyle = '#FFFFFF';
+        context.lineWidth = 6;
+        context.moveTo(bullet.x, bullet.y);
+        bullet.y += 3;
+        context.lineTo(bullet.x, bullet.y);
+        context.fill();
+        context.stroke();
+    }
+}
+
 let enemyBulletListIteratorFirst = 0;
 function handle_enemy_bullet_positions() {
     for (let i=enemyBulletListIteratorFirst; i<enemyBulletList.length; i++) {
@@ -285,6 +312,15 @@ function handle_enemy_directional_bullet_positions() {
             enemyDirectionalBulletListIteratorFirst++;
         }
         draw_enemy_directional_bullet(enemyDirectionalBulletList[i]);
+    }
+}
+let enemyChapterMainTripleBulletListIteratorFirst = 0;
+function handle_enemy_chapter_main_triple_bullets_positions() {
+    for (let i=enemyChapterMainTripleBulletListIteratorFirst; i<enemyChapterMainTripleBulletList.length; i++) {
+        if (enemyChapterMainTripleBulletList[i].y > 700) {
+            enemyChapterMainTripleBulletListIteratorFirst++;
+        }
+        draw_enemy_chapter_main_triple_bullets(enemyChapterMainTripleBulletList[i]);
     }
 }
 
@@ -481,6 +517,7 @@ function frame(timestamp) {
     }
     if (counter%120 == 0) {
         shoot_enemy_directional_bullet();  // medium sideways moving enemy
+        shoot_chapter_main_enemy_triple_bullets();
     }
     if (counter%240 == 0) {
         create_small_dumb_enemy();
@@ -515,6 +552,7 @@ function frame(timestamp) {
     //draw_active_targets();
     handle_enemy_bullet_positions();
     handle_enemy_directional_bullet_positions();
+    handle_enemy_chapter_main_triple_bullets_positions();
     handle_bullet_positions();
     handle_side_missile_positions();
     check_collisions_bullets_missiles_items();
