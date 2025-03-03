@@ -86,24 +86,11 @@ let asteroid_list = [
     new Asteroid(40, 40, 0.2)
 ]
 
-/*let enemyList = [[350,0], [400,0], [450,0]];
-function draw_three_small_dumb_enemies(dy) {
-    for (let i=0; i<enemyList.length; i++) {
-        context.beginPath();
-        context.strokeStyle = '#FFFFFF';
-        context.fillStyle = '#FFFFFF';
-        context.lineWidth = 2;
-        context.moveTo(enemyList[i][0] + 0, 0 + dy);
-        context.lineTo(enemyList[i][0] + 10, -20 + dy);
-        context.lineTo(enemyList[i][0] - 10, -20 + dy);
-        context.fill();
-        context.stroke();
+class Shooter {
+    constructor() {
+        this.x = 300;
+        this.y = 520;
     }
-}*/
-
-function Shooter() {
-    this.x = 300;
-    this.y = 520;
 }
 let shooter = new Shooter();
 
@@ -121,15 +108,16 @@ function draw_shooter(shooter) {
 }
 
 let smallDumbEnemyList = [];
-function SmallDumbEnemy() {
-    this.x = 50 + 500 * Math.random();
-    this.y = -30;
-    this.hitPoints = 1;
+class SmallDumbEnemy {
+    constructor() {
+        this.x = 50 + 500 * Math.random();
+        this.y = -30;
+        this.hitPoints = 1;
+    }
 }
 
 function create_small_dumb_enemy() {
-    let smallDumbEnemy = new SmallDumbEnemy();
-    smallDumbEnemyList.push(smallDumbEnemy);
+    smallDumbEnemyList.push(new SmallDumbEnemy());
 }
 
 function draw_small_dumb_enemy(enemy) {
@@ -148,16 +136,17 @@ function draw_small_dumb_enemy(enemy) {
 }
 
 let mediumSimpleEnemyList = [];
-function MediumSimpleEnemy() {
-    this.x = -50;
-    this.y = 70;
-    this.hitPoints = 10;
-    this.moveDirection = "right";
+class MediumSimpleEnemy {
+    constructor() {
+        this.x = -50;
+        this.y = 70;
+        this.hitPoints = 10;
+        this.moveDirection = "right";
+    }
 }
 
 function create_medium_simple_enemy() {
-    let mediumSimpleEnemy = new MediumSimpleEnemy();
-    mediumSimpleEnemyList.push(mediumSimpleEnemy);
+    mediumSimpleEnemyList.push(new MediumSimpleEnemy());
 }
 
 function draw_medium_simple_enemy(enemy) {
@@ -179,11 +168,13 @@ function draw_medium_simple_enemy(enemy) {
 }
 
 let chapterMainEnemy;
-function ChapterMainEnemy() {
-    this.x = 300;
-    this.y = 0;
-    this.hitPoints = 1000;
-    this.moveDirection = "left";
+class ChapterMainEnemy {
+    constructor() {
+        this.x = 300;
+        this.y = 0;
+        this.hitPoints = 1000;
+        this.moveDirection = "left";
+    }
 }
 
 function create_chapter_main_enemy() {
@@ -217,42 +208,46 @@ function draw_chapter_main_enemy() {
 }
 
 let enemyBulletList = [];
-function EnemyBullet(x) {
-    this.x = x;
-    this.y = 70;
-    this.hit = false;
+class EnemyBullet {
+    constructor(x) {
+        this.x = x;
+        this.y = 70;
+        this.hit = false;
+    }
 }
+
 function shoot_enemy_bullet(x) {
-    let bullet = new EnemyBullet(x);
-    enemyBulletList.push(bullet);
+    enemyBulletList.push(new EnemyBullet(x));
 }
 
 let enemyDirectionalBulletList = [];
-function EnemyDirectionalBullet(x) {
-    this.x = mediumSimpleEnemyList[mediumSimpleEnemyList.length-1].x;
-    this.y = mediumSimpleEnemyList[mediumSimpleEnemyList.length-1].y;
-    this.x_multiplier = (shooter.x - this.x) / 100;
-    this.y_multiplier = (shooter.y - this.y) / 100;
-    this.hit = false;
+class EnemyDirectionalBullet {
+    constructor() {
+        this.x = mediumSimpleEnemyList[mediumSimpleEnemyList.length-1].x;
+        this.y = mediumSimpleEnemyList[mediumSimpleEnemyList.length-1].y;
+        this.x_multiplier = (shooter.x - this.x) / 100;
+        this.y_multiplier = (shooter.y - this.y) / 100;
+        this.hit = false;
+    }
 }
+
 function shoot_enemy_directional_bullet(x) {
-    let bullet = new EnemyDirectionalBullet(x);
-    enemyDirectionalBulletList.push(bullet);
+    enemyDirectionalBulletList.push(new EnemyDirectionalBullet(x));
 }
 
 let enemyChapterMainTripleBulletList = [];
-function EnemyChapterMainBullet(x, y) {
-    this.x = x;
-    this.y = y;
-    this.hit = false;
+class EnemyChapterMainBullet {
+    constructor(x, y) {
+        this.x = x;
+        this.y = y;
+        this.hit = false;
+    }
 }
+
 function shoot_chapter_main_enemy_triple_bullets() {
-    let bullet1 = new EnemyChapterMainBullet(chapterMainEnemy.x-50, chapterMainEnemy.y-20);
-    let bullet2 = new EnemyChapterMainBullet(chapterMainEnemy.x, chapterMainEnemy.y);
-    let bullet3 = new EnemyChapterMainBullet(chapterMainEnemy.x+50, chapterMainEnemy.y-20);
-    enemyChapterMainTripleBulletList.push(bullet1);
-    enemyChapterMainTripleBulletList.push(bullet2);
-    enemyChapterMainTripleBulletList.push(bullet3);
+    enemyChapterMainTripleBulletList.push(new EnemyChapterMainBullet(chapterMainEnemy.x-50, chapterMainEnemy.y-20));
+    enemyChapterMainTripleBulletList.push(new EnemyChapterMainBullet(chapterMainEnemy.x, chapterMainEnemy.y));
+    enemyChapterMainTripleBulletList.push(new EnemyChapterMainBullet(chapterMainEnemy.x+50, chapterMainEnemy.y-20));
 }
 
 function draw_enemy_bullet(bullet) {
@@ -326,15 +321,16 @@ function handle_enemy_chapter_main_triple_bullets_positions() {
 
 // bullets shot by shooter
 let bulletList = [];
-function Bullet() {
-    this.x = shooter.x;
-    this.y = shooter.y;
-    this.hit = false;
+class Bullet {
+    constructor() {
+        this.x = shooter.x;
+        this.y = shooter.y;
+        this.hit = false;
+    }
 }
 
 function shoot_bullet() {
-    let bullet = new Bullet();
-    bulletList.push(bullet);
+    bulletList.push(new Bullet());
 }
 
 function draw_bullet(bullet) {
@@ -361,17 +357,18 @@ function handle_bullet_positions() {
 }
 
 let sideMissileList = [];
-function SideMissile(direction, target_pointer) {
-    this.x = shooter.x;
-    this.y = shooter.y+15;
-    this.direction = direction;
-    this.target_pointer = target_pointer;
-    this.hit = false;
+class SideMissile {
+    constructor(direction, target_pointer) {
+        this.x = shooter.x;
+        this.y = shooter.y+15;
+        this.direction = direction;
+        this.target_pointer = target_pointer;
+        this.hit = false;
+    }
 }
 
 function shoot_side_missile(direction, target_pointer) {
-    let side_missile = new SideMissile(direction, target_pointer);
-    sideMissileList.push(side_missile);
+    sideMissileList.push(new SideMissile(direction, target_pointer));
 }
 
 function draw_side_missile(side_missile) {
@@ -406,11 +403,6 @@ function handle_side_missile_positions() {
         draw_side_missile(sideMissileList[i]);
     }
 }
-
-function moveRight() { return shooter.x += 10; }
-function moveLeft() { return shooter.x -= 10; }
-function moveUp() { return shooter.y -= 10; }
-function moveDown() { return shooter.y += 10; }
 
 // active targets can be created manually by pressing 'n'
 window.onkeydown = function(e) {
