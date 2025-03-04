@@ -107,7 +107,7 @@ function draw_shooter(shooter) {
     context.stroke();
 }
 
-let smallDumbEnemyList = [];
+let enemyList = [];
 class SmallDumbEnemy {
     constructor() {
         this.x = 50 + 500 * Math.random();
@@ -117,7 +117,7 @@ class SmallDumbEnemy {
 }
 
 function create_small_dumb_enemy() {
-    smallDumbEnemyList.push(new SmallDumbEnemy());
+    enemyList.push(new SmallDumbEnemy());
 }
 
 function draw_small_dumb_enemy(enemy) {
@@ -146,7 +146,9 @@ class MediumSimpleEnemy {
 }
 
 function create_medium_simple_enemy() {
-    mediumSimpleEnemyList.push(new MediumSimpleEnemy());
+    let medium_enemy = new MediumSimpleEnemy();
+    mediumSimpleEnemyList.push(medium_enemy);
+    enemyList.push(medium_enemy);
 }
 
 function draw_medium_simple_enemy(enemy) {
@@ -232,7 +234,9 @@ class EnemyDirectionalBullet {
 }
 
 function shoot_enemy_directional_bullet(x) {
-    enemyDirectionalBulletList.push(new EnemyDirectionalBullet(x));
+    if (mediumSimpleEnemyList.length > 0) {
+        enemyDirectionalBulletList.push(new EnemyDirectionalBullet(x));
+    }
 }
 
 let enemyChapterMainTripleBulletList = [];
@@ -379,14 +383,14 @@ function draw_side_missile(side_missile) {
         context.lineWidth = 2;
         context.moveTo(side_missile.x, side_missile.y);
         side_missile.y -= 5;
-        if (side_missile.x > smallDumbEnemyList[side_missile.target_pointer].x) {
-            let difference = side_missile.x - (smallDumbEnemyList[side_missile.target_pointer].x);
+        if (side_missile.x > enemyList[side_missile.target_pointer].x) {
+            let difference = side_missile.x - (enemyList[side_missile.target_pointer].x);
             let delta_x = 7 * difference/100;  // missile x change is relative to target x
             if (delta_x > 7) delta_x = 7;      // missile x change is max 7
             side_missile.x -= delta_x;
         }
-        if (side_missile.x < smallDumbEnemyList[side_missile.target_pointer].x) {
-            let difference = (smallDumbEnemyList[side_missile.target_pointer].x) - side_missile.x;
+        if (side_missile.x < enemyList[side_missile.target_pointer].x) {
+            let difference = (enemyList[side_missile.target_pointer].x) - side_missile.x;
             let delta_x = 7 * difference/100;  // missile x change is relative to target x
             if (delta_x > 7) delta_x = 7;      // missile x change is max 7
             side_missile.x += delta_x;
@@ -419,11 +423,11 @@ function check_collisions_bullets_missiles_items() {
     // bullets - targets
     for (let j=0; j<bulletList.length; j++) {
         if (bulletList[j].hit == true) continue;
-        for (let i=0; i<smallDumbEnemyList.length; i++) {
-            if (smallDumbEnemyList[i].hitPoints <=0) continue;
-            if (bulletList[j].x <= smallDumbEnemyList[i].x+10 && smallDumbEnemyList[i].x-10 <= bulletList[j].x) {
-                if (bulletList[j].y <= smallDumbEnemyList[i].y+3 && smallDumbEnemyList[i].y-10 <= bulletList[j].y) {
-                    smallDumbEnemyList[i].hitPoints--;
+        for (let i=0; i<enemyList.length; i++) {
+            if (enemyList[i].hitPoints <=0) continue;
+            if (bulletList[j].x <= enemyList[i].x+10 && enemyList[i].x-10 <= bulletList[j].x) {
+                if (bulletList[j].y <= enemyList[i].y+3 && enemyList[i].y-10 <= bulletList[j].y) {
+                    enemyList[i].hitPoints--;
                     bulletList[j].hit = true;
                 }
             }
@@ -432,11 +436,11 @@ function check_collisions_bullets_missiles_items() {
     // side missiles - targets
     for (let j=0; j<sideMissileList.length; j++) {
         if (sideMissileList[j].hit == true) continue;
-        for (let i=0; i<smallDumbEnemyList.length; i++) {
-            if (smallDumbEnemyList[i].hitPoints <=0) continue;
-            if (sideMissileList[j].x <= smallDumbEnemyList[i].x+10 && smallDumbEnemyList[i].x-10 <= sideMissileList[j].x) {
-                if (sideMissileList[j].y <= smallDumbEnemyList[i].y+3 && smallDumbEnemyList[i].y-10 <= sideMissileList[j].y) {
-                    smallDumbEnemyList[i].hitPoints--;
+        for (let i=0; i<enemyList.length; i++) {
+            if (enemyList[i].hitPoints <=0) continue;
+            if (sideMissileList[j].x <= enemyList[i].x+10 && enemyList[i].x-10 <= sideMissileList[j].x) {
+                if (sideMissileList[j].y <= enemyList[i].y+3 && enemyList[i].y-10 <= sideMissileList[j].y) {
+                    enemyList[i].hitPoints--;
                     sideMissileList[j].hit = true;
                 }
             }
@@ -444,43 +448,44 @@ function check_collisions_bullets_missiles_items() {
     }
 }
 
-let active_small_target_pointer = 0;
+let active_target_pointer = 0;
 let active_medium_target_pointer = 0;
 let active_chapter_enemy_target_pointer = 0;
 function go_through_active_target_list() {
-    // smallDumbEnemyList
-    if (smallDumbEnemyList[active_small_target_pointer] != undefined) {
-        let difference = shooter.x - (smallDumbEnemyList[active_small_target_pointer].x);
+    if (enemyList[active_target_pointer] != undefined) {
+        let difference = shooter.x - (enemyList[active_target_pointer].x);
         if (difference > 0 && difference <=200) shooter.x -= 2;
         else if (difference < 0 && difference >= -200) shooter.x += 2;
         else if (difference > 200) {  // shooting left side missile
             let time = 0;
-            for (let i=0; i<smallDumbEnemyList[active_small_target_pointer].hitPoints; i++) {
-                let target_pointer = active_small_target_pointer;
+            for (let i=0; i<enemyList[active_target_pointer].hitPoints; i++) {
+                let target_pointer = active_target_pointer;
                 setTimeout(() => shoot_side_missile("left", target_pointer), time);
                 time += 30;
             }
-            active_small_target_pointer++;
+            active_target_pointer++;
         }
         else if (difference < -200) {  // shooting right side missile
             let time = 0;
-            for (let i=0; i<smallDumbEnemyList[active_small_target_pointer].hitPoints; i++) {
-                let target_pointer = active_small_target_pointer;
+            for (let i=0; i<enemyList[active_target_pointer].hitPoints; i++) {
+                let target_pointer = active_target_pointer;
                 setTimeout(() => shoot_side_missile("right", target_pointer), time);
                 time += 30;
             }
-            active_small_target_pointer++;
+            active_target_pointer++;
         }
         if (Math.abs(difference) < 1) {  // shooter pointing at target
             let time = 0;
-            for (let i=0; i<smallDumbEnemyList[active_small_target_pointer].hitPoints; i++) {
+            for (let i=0; i<enemyList[active_target_pointer].hitPoints; i++) {
                 setTimeout(() => shoot_bullet(), time);
                 time += 30;
             }
-            active_small_target_pointer++;
+            active_target_pointer++;
         }
     }
     // mediumSimpleEnemyList
+    // chapter main enemy
+    //console.log("chapter main enemy position:", chapterMainEnemy);
 }
 
 function draw_new_design() {
@@ -513,16 +518,18 @@ function frame(timestamp) {
     }
     if (counter%240 == 0) {
         create_small_dumb_enemy();
+    }
+    if (counter%600 == 0) {
+        create_medium_simple_enemy();
         shoot_enemy_bullet(mediumSimpleEnemyList[0].x);
     }
     if (counter == 10) {  //(counter%360 == 0) {
-        create_medium_simple_enemy();
         create_chapter_main_enemy();
     }
     draw_shooter(shooter);  // moving shooter
-    if (smallDumbEnemyList.length > 0) {
-        for (let i=0; i<smallDumbEnemyList.length; i++) {
-            draw_small_dumb_enemy(smallDumbEnemyList[i]);
+    if (enemyList.length > 0) {
+        for (let i=0; i<enemyList.length; i++) {
+            draw_small_dumb_enemy(enemyList[i]);
         }
     }
     if (mediumSimpleEnemyList.length > 0) {
