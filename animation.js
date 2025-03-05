@@ -411,7 +411,7 @@ function handle_side_missile_positions() {
 // active targets can be created manually by pressing 'n'
 window.onkeydown = function(e) {
     let key = e.key || e.keyCode
-    console.log('key: ', key);
+    //console.log('key: ', key);
     switch(key) {
         case 'n':
             create_small_dumb_enemy();
@@ -488,6 +488,35 @@ function go_through_active_target_list() {
     //console.log("chapter main enemy position:", chapterMainEnemy);
 }
 
+function enemy_in_front_direct_shooting(active_target_pointer) {
+    //console.log("shooter x:", shooter.x);
+    for (let i=0; i<enemyList.length; i++) {
+        if (i == active_target_pointer) continue;
+        if (enemyList[i].hitPoints > 0) {
+            //console.log("enemyList:", enemyList[i].x, "shooter.x:", shooter.x);
+            if ((enemyList[i].x < shooter.x+2) && (shooter.x-2 < enemyList[i].x)) {
+                console.log("in sight:", shooter.x, enemyList[i].x, "SHOOTING");
+                shoot_bullet();
+            }
+        }
+    }
+    console.log("________________________________");
+}
+
+function check_if_enemy_on_shooting_line() {
+    for (let i=0; i<enemyList.length; i++) {
+        if (enemyList[i].hitPoints > 0) {
+            if ((enemyList[i].x < shooter.x+2) && (shooter.x-2 < enemyList[i].x)) {
+                //console.log("in sight:", shooter.x, enemyList[i].x, "i&pointer:", i, active_target_pointer);
+                if (i+1 != active_target_pointer) {
+                    console.log("shoot extra bullet");
+                    shoot_bullet();
+                }
+            }
+        }
+    }
+}
+
 function draw_new_design() {
     context.beginPath();
     context.strokeStyle = '#FFFFFF';
@@ -509,6 +538,13 @@ function frame(timestamp) {
     dy_small_dumb++;
     dy_active_targets++;
     counter++;
+    if (counter == 10) {  //(counter%360 == 0) {
+        create_chapter_main_enemy();
+    }
+    if (counter%3 == 0) {
+        check_if_enemy_on_shooting_line();
+        //enemy_in_front_direct_shooting(active_target_pointer);
+    }
     if (counter%60 == 0) {
         shoot_enemy_bullet(100);
     }
@@ -522,9 +558,6 @@ function frame(timestamp) {
     if (counter%600 == 0) {
         create_medium_simple_enemy();
         shoot_enemy_bullet(mediumSimpleEnemyList[0].x);
-    }
-    if (counter == 10) {  //(counter%360 == 0) {
-        create_chapter_main_enemy();
     }
     draw_shooter(shooter);  // moving shooter
     if (enemyList.length > 0) {
