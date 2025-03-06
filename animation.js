@@ -112,6 +112,7 @@ class SmallDumbEnemy {
     constructor() {
         this.x = 50 + 500 * Math.random();
         this.y = -30;
+        this.type = "small simple";
         this.hitPoints = 1;
     }
 }
@@ -141,6 +142,7 @@ class MediumSimpleEnemy {
         this.x = -50;
         this.y = 70;
         this.hitPoints = 10;
+        this.type = "medium simple";
         this.moveDirection = "right";
     }
 }
@@ -509,12 +511,21 @@ function check_if_enemy_on_shooting_line() {
             if ((enemyList[i].x < shooter.x+2) && (shooter.x-2 < enemyList[i].x)) {
                 //console.log("in sight:", shooter.x, enemyList[i].x, "i&pointer:", i, active_target_pointer);
                 if (i+1 != active_target_pointer) {
-                    console.log("shoot extra bullet");
+                    //console.log("shoot extra bullet");
                     shoot_bullet();
                 }
             }
         }
     }
+}
+
+function go_through_missed_targets() {
+    for (let i=0; i<active_target_pointer; i++) {
+        if (enemyList[i].hitPoints > 0 && enemyList[i].y < 700) {
+            console.log(i, active_target_pointer, "-", enemyList[i]);
+        }
+    }
+    console.log("_________________________________");
 }
 
 function draw_new_design() {
@@ -540,6 +551,7 @@ function frame(timestamp) {
     counter++;
     if (counter == 10) {  //(counter%360 == 0) {
         create_chapter_main_enemy();
+        if (shooter.x < 0) shooter.x++;
     }
     if (counter%3 == 0) {
         check_if_enemy_on_shooting_line();
@@ -547,12 +559,13 @@ function frame(timestamp) {
     }
     if (counter%60 == 0) {
         shoot_enemy_bullet(100);
+        go_through_missed_targets();
     }
     if (counter%120 == 0) {
         shoot_enemy_directional_bullet();  // medium sideways moving enemy
         shoot_chapter_main_enemy_triple_bullets();
     }
-    if (counter%240 == 0) {
+    if (counter%120 == 0) {
         create_small_dumb_enemy();
     }
     if (counter%600 == 0) {
@@ -562,7 +575,8 @@ function frame(timestamp) {
     draw_shooter(shooter);  // moving shooter
     if (enemyList.length > 0) {
         for (let i=0; i<enemyList.length; i++) {
-            draw_small_dumb_enemy(enemyList[i]);
+            if (enemyList[i].type == "small simple")
+                draw_small_dumb_enemy(enemyList[i]);
         }
     }
     if (mediumSimpleEnemyList.length > 0) {
