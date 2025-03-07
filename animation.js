@@ -434,6 +434,14 @@ function check_collisions_bullets_missiles_items() {
                 }
             }
         }
+        // bullets - chapter main enemy
+        if (bulletList[j].hit == true) continue;
+        if (bulletList[j].x <= chapterMainEnemy.x+50 && chapterMainEnemy.x-50 <= bulletList[j].x) {
+            if (bulletList[j].y <= chapterMainEnemy.y+3 && chapterMainEnemy.y-10 <= bulletList[j].y) {
+                chapterMainEnemy.hitPoints--;
+                bulletList[j].hit = true;
+            }
+        }
     }
     // side missiles - targets
     for (let j=0; j<sideMissileList.length; j++) {
@@ -492,27 +500,31 @@ function go_through_active_target_list() {
 
 function enemy_in_front_direct_shooting(active_target_pointer) {
     //console.log("shooter x:", shooter.x);
+    let time = 0;
     for (let i=0; i<enemyList.length; i++) {
         if (i == active_target_pointer) continue;
         if (enemyList[i].hitPoints > 0) {
             //console.log("enemyList:", enemyList[i].x, "shooter.x:", shooter.x);
             if ((enemyList[i].x < shooter.x+2) && (shooter.x-2 < enemyList[i].x)) {
-                console.log("in sight:", shooter.x, enemyList[i].x, "SHOOTING");
-                shoot_bullet();
+                //console.log("in sight:", shooter.x, enemyList[i].x, "SHOOTING");
+                setTimeout(() => shoot_bullet(), time);
+                time += 30;
             }
         }
     }
-    console.log("________________________________");
+    //console.log("________________________________");
 }
 
 function check_if_enemy_on_shooting_line() {
+    let time = 0;
     for (let i=0; i<enemyList.length; i++) {
         if (enemyList[i].hitPoints > 0) {
             if ((enemyList[i].x < shooter.x+2) && (shooter.x-2 < enemyList[i].x)) {
                 //console.log("in sight:", shooter.x, enemyList[i].x, "i&pointer:", i, active_target_pointer);
                 if (i+1 != active_target_pointer) {
                     //console.log("shoot extra bullet");
-                    shoot_bullet();
+                    setTimeout(() => shoot_bullet(), time);
+                    time += 30;
                 }
             }
         }
@@ -522,10 +534,21 @@ function check_if_enemy_on_shooting_line() {
 function go_through_missed_targets() {
     for (let i=0; i<active_target_pointer; i++) {
         if (enemyList[i].hitPoints > 0 && enemyList[i].y < 700) {
-            console.log(i, active_target_pointer, "-", enemyList[i]);
+            //console.log(i, active_target_pointer, "-", enemyList[i]);
         }
     }
-    console.log("_________________________________");
+    //console.log("_________________________________");
+}
+
+function check_if_chapter_main_enemy_on_shooting_line() {
+    let time = 0;
+    if (chapterMainEnemy) {
+        if (shooter.x < chapterMainEnemy.x+30 && chapterMainEnemy.x-30 < shooter.x) {
+            //console.log("in front");
+            setTimeout(() => shoot_bullet(), time);
+            time += 10;
+        }
+    }
 }
 
 function draw_new_design() {
@@ -553,13 +576,17 @@ function frame(timestamp) {
         create_chapter_main_enemy();
         if (shooter.x < 0) shooter.x++;
     }
-    if (counter%3 == 0) {
+    if (counter%1 == 0) {
         check_if_enemy_on_shooting_line();
         //enemy_in_front_direct_shooting(active_target_pointer);
+    }
+    if (counter%10 == 0) {
+        check_if_chapter_main_enemy_on_shooting_line();
     }
     if (counter%60 == 0) {
         shoot_enemy_bullet(100);
         go_through_missed_targets();
+        console.log("chapter main enemy hit points:", chapterMainEnemy.hitPoints);
     }
     if (counter%120 == 0) {
         shoot_enemy_directional_bullet();  // medium sideways moving enemy
