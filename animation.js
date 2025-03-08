@@ -176,7 +176,7 @@ class ChapterMainEnemy {
     constructor() {
         this.x = 300;
         this.y = 0;
-        this.hitPoints = 1000;
+        this.hitPoints = 100;
         this.moveDirection = "left";
     }
 }
@@ -522,7 +522,7 @@ function check_if_enemy_on_shooting_line() {
             if ((enemyList[i].x < shooter.x+2) && (shooter.x-2 < enemyList[i].x)) {
                 //console.log("in sight:", shooter.x, enemyList[i].x, "i&pointer:", i, active_target_pointer);
                 if (i+1 != active_target_pointer) {
-                    //console.log("shoot extra bullet");
+                    console.log("shoot extra bullet");
                     setTimeout(() => shoot_bullet(), time);
                     time += 30;
                 }
@@ -544,7 +544,6 @@ function check_if_chapter_main_enemy_on_shooting_line() {
     let time = 0;
     if (chapterMainEnemy) {
         if (shooter.x < chapterMainEnemy.x+30 && chapterMainEnemy.x-30 < shooter.x) {
-            //console.log("in front");
             setTimeout(() => shoot_bullet(), time);
             time += 10;
         }
@@ -563,6 +562,8 @@ function draw_new_design() {
     context.stroke();
 }
 
+let shootingLinePause = 0;
+
 function frame(timestamp) {
     context.clearRect(0, 0, context.canvas.width, context.canvas.height);
     if (!previous) previous = timestamp;
@@ -574,15 +575,24 @@ function frame(timestamp) {
     counter++;
     if (counter == 10) {  //(counter%360 == 0) {
         create_chapter_main_enemy();
-        if (shooter.x < 0) shooter.x++;
+        if (shooter.x < 100) {
+            for (let i=0; i<50; i++) {
+                shooter.x++;
+            }
+        }
     }
     if (counter%1 == 0) {
-        check_if_enemy_on_shooting_line();
         //enemy_in_front_direct_shooting(active_target_pointer);
+        if (shootingLinePause == 0) {
+            check_if_enemy_on_shooting_line();
+            shootingLinePause = 20;
+            console.log("shootingLinePause:", shootingLinePause);
+        }
     }
     if (counter%10 == 0) {
         check_if_chapter_main_enemy_on_shooting_line();
     }
+    shootingLinePause--;
     if (counter%60 == 0) {
         shoot_enemy_bullet(100);
         go_through_missed_targets();
@@ -590,7 +600,9 @@ function frame(timestamp) {
     }
     if (counter%120 == 0) {
         shoot_enemy_directional_bullet();  // medium sideways moving enemy
-        shoot_chapter_main_enemy_triple_bullets();
+        if (chapterMainEnemy.hitPoints > 0) {
+            shoot_chapter_main_enemy_triple_bullets();
+        }
     }
     if (counter%120 == 0) {
         create_small_dumb_enemy();
